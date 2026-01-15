@@ -1,0 +1,1090 @@
+{
+  "university": {
+    "name": "Tech University",
+    "code": "TU",
+    "academic_year": "2024-2025"
+  },
+  "grading_scale": {
+    "AA": {"min": 90, "max": 100, "gpa": 4.0},
+    "BA": {"min": 85, "max": 89, "gpa": 3.5},
+    "BB": {"min": 80, "max": 84, "gpa": 3.0},
+    "CB": {"min": 75, "max": 79, "gpa": 2.5},
+    "CC": {"min": 70, "max": 74, "gpa": 2.0},
+    "DC": {"min": 65, "max": 69, "gpa": 1.5},
+    "DD": {"min": 60, "max": 64, "gpa": 1.0},
+    "FD": {"min": 50, "max": 59, "gpa": 0.5},
+    "FF": {"min": 0, "max": 49, "gpa": 0.0}
+  },
+  "grade_weights": {
+    "midterm": 0.4,
+    "final": 0.6
+  },
+  "semesters": [
+    {
+      "id": "2022-FALL",
+      "name": "2022-2023 Fall",
+      "start_date": "2022-09-19",
+      "end_date": "2023-01-20",
+      "is_current": false
+    },
+    {
+      "id": "2023-SPRING",
+      "name": "2022-2023 Spring",
+      "start_date": "2023-02-06",
+      "end_date": "2023-06-09",
+      "is_current": false
+    },
+    {
+      "id": "2023-FALL",
+      "name": "2023-2024 Fall",
+      "start_date": "2023-09-18",
+      "end_date": "2024-01-19",
+      "is_current": false
+    },
+    {
+      "id": "2024-SPRING",
+      "name": "2023-2024 Spring",
+      "start_date": "2024-02-05",
+      "end_date": "2024-06-07",
+      "is_current": false
+    },
+    {
+      "id": "2024-FALL",
+      "name": "2024-2025 Fall",
+      "start_date": "2024-09-16",
+      "end_date": "2025-01-17",
+      "is_current": true
+    }
+  ],
+  "departments": [
+    {
+      "id": "CENG",
+      "name": "Computer Engineering",
+      "head": "Dr. Robert Chen",
+      "graduation_requirements": {
+        "min_credits": 140,
+        "min_gpa": 2.0,
+        "required_courses": [
+          "CENG101", "CENG102", "CENG201", "CENG202",
+          "CENG301", "CENG302", "CENG401", "CENG402",
+          "MATH101", "MATH102", "MATH201"
+        ],
+        "min_elective_credits": 18
+      }
+    },
+    {
+      "id": "SENG",
+      "name": "Software Engineering",
+      "head": "Dr. Sarah Williams",
+      "graduation_requirements": {
+        "min_credits": 140,
+        "min_gpa": 2.0,
+        "required_courses": [
+          "SENG101", "SENG102", "SENG201", "SENG202",
+          "SENG301", "SENG302", "SENG401", "SENG402",
+          "MATH101", "MATH102", "MATH201"
+        ],
+        "min_elective_credits": 18
+      }
+    }
+  ],
+  "courses": [
+    {
+      "id": "MATH101",
+      "code": "MATH 101",
+      "name": "Calculus I",
+      "department_id": "CENG",
+      "credits": 4,
+      "semester": 1,
+      "type": "required",
+      "prerequisites": [],
+      "description": "Limits, derivatives, and integrals of single-variable functions"
+    },
+    {
+      "id": "MATH102",
+      "code": "MATH 102",
+      "name": "Calculus II",
+      "department_id": "CENG",
+      "credits": 4,
+      "semester": 2,
+      "type": "required",
+      "prerequisites": ["MATH101"],
+      "description": "Integration techniques, sequences, series, and multivariable calculus introduction"
+    },
+    {
+      "id": "MATH201",
+      "code": "MATH 201",
+      "name": "Linear Algebra",
+      "department_id": "CENG",
+      "credits": 3,
+      "semester": 3,
+      "type": "required",
+      "prerequisites": ["MATH101"],
+      "description": "Vectors, matrices, linear transformations, eigenvalues and eigenvectors"
+    },
+    {
+      "id": "MATH202",
+      "code": "MATH 202",
+      "name": "Discrete Mathematics",
+      "department_id": "CENG",
+      "credits": 3,
+      "semester": 3,
+      "type": "required",
+      "prerequisites": [],
+      "description": "Logic, sets, relations, functions, graph theory, and combinatorics"
+    },
+    {
+      "id": "CENG101",
+      "code": "CENG 101",
+      "name": "Introduction to Programming",
+      "department_id": "CENG",
+      "credits": 4,
+      "semester": 1,
+      "type": "required",
+      "prerequisites": [],
+      "description": "Fundamentals of programming using Python: variables, control flow, functions"
+    },
+    {
+      "id": "CENG102",
+      "code": "CENG 102",
+      "name": "Object-Oriented Programming",
+      "department_id": "CENG",
+      "credits": 4,
+      "semester": 2,
+      "type": "required",
+      "prerequisites": ["CENG101"],
+      "description": "OOP concepts using Java: classes, inheritance, polymorphism, interfaces"
+    },
+    {
+      "id": "CENG201",
+      "code": "CENG 201",
+      "name": "Data Structures",
+      "department_id": "CENG",
+      "credits": 4,
+      "semester": 3,
+      "type": "required",
+      "prerequisites": ["CENG102"],
+      "description": "Arrays, linked lists, stacks, queues, trees, heaps, and hash tables"
+    },
+    {
+      "id": "CENG202",
+      "code": "CENG 202",
+      "name": "Algorithms",
+      "department_id": "CENG",
+      "credits": 4,
+      "semester": 4,
+      "type": "required",
+      "prerequisites": ["CENG201", "MATH202"],
+      "description": "Algorithm design and analysis: sorting, searching, graph algorithms, dynamic programming"
+    },
+    {
+      "id": "CENG301",
+      "code": "CENG 301",
+      "name": "Database Systems",
+      "department_id": "CENG",
+      "credits": 4,
+      "semester": 5,
+      "type": "required",
+      "prerequisites": ["CENG201"],
+      "description": "Relational databases, SQL, normalization, transactions, and indexing"
+    },
+    {
+      "id": "CENG302",
+      "code": "CENG 302",
+      "name": "Operating Systems",
+      "department_id": "CENG",
+      "credits": 4,
+      "semester": 5,
+      "type": "required",
+      "prerequisites": ["CENG201"],
+      "description": "Process management, memory management, file systems, and concurrency"
+    },
+    {
+      "id": "CENG401",
+      "code": "CENG 401",
+      "name": "Computer Networks",
+      "department_id": "CENG",
+      "credits": 3,
+      "semester": 7,
+      "type": "required",
+      "prerequisites": ["CENG302"],
+      "description": "Network protocols, TCP/IP, routing, network security fundamentals"
+    },
+    {
+      "id": "CENG402",
+      "code": "CENG 402",
+      "name": "Senior Project",
+      "department_id": "CENG",
+      "credits": 6,
+      "semester": 8,
+      "type": "required",
+      "prerequisites": ["CENG301", "CENG302"],
+      "description": "Capstone project demonstrating comprehensive software development skills"
+    },
+    {
+      "id": "CENG350",
+      "code": "CENG 350",
+      "name": "Artificial Intelligence",
+      "department_id": "CENG",
+      "credits": 3,
+      "semester": 6,
+      "type": "elective",
+      "prerequisites": ["CENG202"],
+      "description": "Search algorithms, machine learning basics, neural networks introduction"
+    },
+    {
+      "id": "CENG360",
+      "code": "CENG 360",
+      "name": "Web Development",
+      "department_id": "CENG",
+      "credits": 3,
+      "semester": 5,
+      "type": "elective",
+      "prerequisites": ["CENG102"],
+      "description": "HTML, CSS, JavaScript, REST APIs, and modern web frameworks"
+    },
+    {
+      "id": "CENG370",
+      "code": "CENG 370",
+      "name": "Mobile Application Development",
+      "department_id": "CENG",
+      "credits": 3,
+      "semester": 6,
+      "type": "elective",
+      "prerequisites": ["CENG102"],
+      "description": "Android and iOS development, mobile UI/UX, app deployment"
+    },
+    {
+      "id": "SENG101",
+      "code": "SENG 101",
+      "name": "Introduction to Software Engineering",
+      "department_id": "SENG",
+      "credits": 3,
+      "semester": 1,
+      "type": "required",
+      "prerequisites": [],
+      "description": "Software development lifecycle, requirements, and project management basics"
+    },
+    {
+      "id": "SENG102",
+      "code": "SENG 102",
+      "name": "Programming Fundamentals",
+      "department_id": "SENG",
+      "credits": 4,
+      "semester": 1,
+      "type": "required",
+      "prerequisites": [],
+      "description": "Programming basics with Python: syntax, data types, control structures"
+    },
+    {
+      "id": "SENG201",
+      "code": "SENG 201",
+      "name": "Software Design Patterns",
+      "department_id": "SENG",
+      "credits": 3,
+      "semester": 3,
+      "type": "required",
+      "prerequisites": ["SENG102"],
+      "description": "Creational, structural, and behavioral design patterns"
+    },
+    {
+      "id": "SENG202",
+      "code": "SENG 202",
+      "name": "Software Testing",
+      "department_id": "SENG",
+      "credits": 3,
+      "semester": 4,
+      "type": "required",
+      "prerequisites": ["SENG201"],
+      "description": "Unit testing, integration testing, test-driven development, CI/CD"
+    },
+    {
+      "id": "SENG301",
+      "code": "SENG 301",
+      "name": "Software Architecture",
+      "department_id": "SENG",
+      "credits": 3,
+      "semester": 5,
+      "type": "required",
+      "prerequisites": ["SENG201"],
+      "description": "Architectural patterns, microservices, scalability, and system design"
+    },
+    {
+      "id": "SENG302",
+      "code": "SENG 302",
+      "name": "Agile Development",
+      "department_id": "SENG",
+      "credits": 3,
+      "semester": 5,
+      "type": "required",
+      "prerequisites": ["SENG101"],
+      "description": "Scrum, Kanban, sprint planning, and agile project management"
+    },
+    {
+      "id": "SENG401",
+      "code": "SENG 401",
+      "name": "DevOps Engineering",
+      "department_id": "SENG",
+      "credits": 3,
+      "semester": 7,
+      "type": "required",
+      "prerequisites": ["SENG301"],
+      "description": "Docker, Kubernetes, cloud deployment, monitoring, and automation"
+    },
+    {
+      "id": "SENG402",
+      "code": "SENG 402",
+      "name": "Capstone Project",
+      "department_id": "SENG",
+      "credits": 6,
+      "semester": 8,
+      "type": "required",
+      "prerequisites": ["SENG301", "SENG302"],
+      "description": "End-to-end software project from requirements to deployment"
+    }
+  ],
+  "students": [
+    {
+      "id": "STU001",
+      "name": "Emily Johnson",
+      "email": "emily.johnson@tu.edu",
+      "department_id": "CENG",
+      "enrollment_year": 2022,
+      "current_semester": 5,
+      "status": "active",
+      "gpa": 3.85,
+      "completed_credits": 72,
+      "advisor_notes": "Outstanding student, considering graduate school",
+      "enrollments": [
+        {
+          "course_id": "MATH101",
+          "semester_id": "2022-FALL",
+          "midterm_score": 92,
+          "final_score": 95,
+          "homework_avg": 98,
+          "attendance": 100,
+          "weighted_average": 93.8,
+          "letter_grade": "AA",
+          "status": "passed"
+        },
+        {
+          "course_id": "CENG101",
+          "semester_id": "2022-FALL",
+          "midterm_score": 88,
+          "final_score": 94,
+          "homework_avg": 95,
+          "project_score": 96,
+          "attendance": 98,
+          "weighted_average": 91.6,
+          "letter_grade": "AA",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH102",
+          "semester_id": "2023-SPRING",
+          "midterm_score": 85,
+          "final_score": 90,
+          "homework_avg": 92,
+          "attendance": 96,
+          "weighted_average": 88.0,
+          "letter_grade": "BA",
+          "status": "passed"
+        },
+        {
+          "course_id": "CENG102",
+          "semester_id": "2023-SPRING",
+          "midterm_score": 90,
+          "final_score": 92,
+          "homework_avg": 94,
+          "project_score": 95,
+          "attendance": 100,
+          "weighted_average": 91.2,
+          "letter_grade": "AA",
+          "status": "passed"
+        },
+        {
+          "course_id": "CENG201",
+          "semester_id": "2023-FALL",
+          "midterm_score": 87,
+          "final_score": 91,
+          "homework_avg": 90,
+          "project_score": 93,
+          "attendance": 98,
+          "weighted_average": 89.4,
+          "letter_grade": "BA",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH201",
+          "semester_id": "2023-FALL",
+          "midterm_score": 82,
+          "final_score": 88,
+          "homework_avg": 85,
+          "attendance": 94,
+          "weighted_average": 85.6,
+          "letter_grade": "BA",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH202",
+          "semester_id": "2023-FALL",
+          "midterm_score": 90,
+          "final_score": 93,
+          "homework_avg": 95,
+          "attendance": 100,
+          "weighted_average": 91.8,
+          "letter_grade": "AA",
+          "status": "passed"
+        },
+        {
+          "course_id": "CENG202",
+          "semester_id": "2024-SPRING",
+          "midterm_score": 86,
+          "final_score": 89,
+          "homework_avg": 92,
+          "project_score": 90,
+          "attendance": 96,
+          "weighted_average": 87.8,
+          "letter_grade": "BA",
+          "status": "passed"
+        },
+        {
+          "course_id": "CENG301",
+          "semester_id": "2024-FALL",
+          "midterm_score": 88,
+          "final_score": null,
+          "homework_avg": 91,
+          "project_score": null,
+          "attendance": 100,
+          "weighted_average": null,
+          "letter_grade": null,
+          "status": "in_progress"
+        },
+        {
+          "course_id": "CENG302",
+          "semester_id": "2024-FALL",
+          "midterm_score": 85,
+          "final_score": null,
+          "homework_avg": 88,
+          "project_score": null,
+          "attendance": 98,
+          "weighted_average": null,
+          "letter_grade": null,
+          "status": "in_progress"
+        },
+        {
+          "course_id": "CENG350",
+          "semester_id": "2024-FALL",
+          "midterm_score": 92,
+          "final_score": null,
+          "homework_avg": 95,
+          "project_score": null,
+          "attendance": 100,
+          "weighted_average": null,
+          "letter_grade": null,
+          "status": "in_progress"
+        }
+      ]
+    },
+    {
+      "id": "STU002",
+      "name": "Michael Brown",
+      "email": "michael.brown@tu.edu",
+      "department_id": "CENG",
+      "enrollment_year": 2022,
+      "current_semester": 5,
+      "status": "active",
+      "gpa": 2.65,
+      "completed_credits": 68,
+      "advisor_notes": "Average performer, struggles with math courses",
+      "enrollments": [
+        {
+          "course_id": "MATH101",
+          "semester_id": "2022-FALL",
+          "midterm_score": 62,
+          "final_score": 68,
+          "homework_avg": 70,
+          "attendance": 85,
+          "weighted_average": 65.6,
+          "letter_grade": "DC",
+          "status": "passed"
+        },
+        {
+          "course_id": "CENG101",
+          "semester_id": "2022-FALL",
+          "midterm_score": 75,
+          "final_score": 78,
+          "homework_avg": 80,
+          "project_score": 82,
+          "attendance": 90,
+          "weighted_average": 76.8,
+          "letter_grade": "CB",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH102",
+          "semester_id": "2023-SPRING",
+          "midterm_score": 55,
+          "final_score": 52,
+          "homework_avg": 60,
+          "attendance": 75,
+          "weighted_average": 53.2,
+          "letter_grade": "FD",
+          "status": "passed"
+        },
+        {
+          "course_id": "CENG102",
+          "semester_id": "2023-SPRING",
+          "midterm_score": 70,
+          "final_score": 75,
+          "homework_avg": 78,
+          "project_score": 80,
+          "attendance": 88,
+          "weighted_average": 73.0,
+          "letter_grade": "CC",
+          "status": "passed"
+        },
+        {
+          "course_id": "CENG201",
+          "semester_id": "2023-FALL",
+          "midterm_score": 72,
+          "final_score": 70,
+          "homework_avg": 75,
+          "project_score": 78,
+          "attendance": 85,
+          "weighted_average": 70.8,
+          "letter_grade": "CC",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH201",
+          "semester_id": "2023-FALL",
+          "midterm_score": 58,
+          "final_score": 62,
+          "homework_avg": 65,
+          "attendance": 80,
+          "weighted_average": 60.4,
+          "letter_grade": "DD",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH202",
+          "semester_id": "2023-FALL",
+          "midterm_score": 65,
+          "final_score": 70,
+          "homework_avg": 72,
+          "attendance": 82,
+          "weighted_average": 68.0,
+          "letter_grade": "DC",
+          "status": "passed"
+        },
+        {
+          "course_id": "CENG202",
+          "semester_id": "2024-SPRING",
+          "midterm_score": 68,
+          "final_score": 72,
+          "homework_avg": 75,
+          "project_score": 77,
+          "attendance": 85,
+          "weighted_average": 70.4,
+          "letter_grade": "CC",
+          "status": "passed"
+        },
+        {
+          "course_id": "CENG301",
+          "semester_id": "2024-FALL",
+          "midterm_score": 70,
+          "final_score": null,
+          "homework_avg": 73,
+          "project_score": null,
+          "attendance": 88,
+          "weighted_average": null,
+          "letter_grade": null,
+          "status": "in_progress"
+        },
+        {
+          "course_id": "CENG360",
+          "semester_id": "2024-FALL",
+          "midterm_score": 78,
+          "final_score": null,
+          "homework_avg": 82,
+          "project_score": null,
+          "attendance": 92,
+          "weighted_average": null,
+          "letter_grade": null,
+          "status": "in_progress"
+        }
+      ]
+    },
+    {
+      "id": "STU003",
+      "name": "David Wilson",
+      "email": "david.wilson@tu.edu",
+      "department_id": "CENG",
+      "enrollment_year": 2022,
+      "current_semester": 5,
+      "status": "probation",
+      "gpa": 1.75,
+      "completed_credits": 52,
+      "advisor_notes": "Academic probation - failed multiple courses, needs intervention",
+      "enrollments": [
+        {
+          "course_id": "MATH101",
+          "semester_id": "2022-FALL",
+          "midterm_score": 45,
+          "final_score": 40,
+          "homework_avg": 50,
+          "attendance": 60,
+          "weighted_average": 42.0,
+          "letter_grade": "FF",
+          "status": "failed"
+        },
+        {
+          "course_id": "CENG101",
+          "semester_id": "2022-FALL",
+          "midterm_score": 55,
+          "final_score": 58,
+          "homework_avg": 62,
+          "project_score": 65,
+          "attendance": 70,
+          "weighted_average": 56.8,
+          "letter_grade": "FD",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH101",
+          "semester_id": "2023-SPRING",
+          "midterm_score": 52,
+          "final_score": 55,
+          "homework_avg": 58,
+          "attendance": 72,
+          "weighted_average": 53.8,
+          "letter_grade": "FD",
+          "status": "passed"
+        },
+        {
+          "course_id": "CENG102",
+          "semester_id": "2023-SPRING",
+          "midterm_score": 48,
+          "final_score": 45,
+          "homework_avg": 55,
+          "project_score": 52,
+          "attendance": 65,
+          "weighted_average": 46.2,
+          "letter_grade": "FF",
+          "status": "failed"
+        },
+        {
+          "course_id": "MATH102",
+          "semester_id": "2023-FALL",
+          "midterm_score": 42,
+          "final_score": 48,
+          "homework_avg": 50,
+          "attendance": 68,
+          "weighted_average": 45.6,
+          "letter_grade": "FF",
+          "status": "failed"
+        },
+        {
+          "course_id": "CENG102",
+          "semester_id": "2023-FALL",
+          "midterm_score": 58,
+          "final_score": 62,
+          "homework_avg": 65,
+          "project_score": 68,
+          "attendance": 75,
+          "weighted_average": 60.4,
+          "letter_grade": "DD",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH102",
+          "semester_id": "2024-SPRING",
+          "midterm_score": 55,
+          "final_score": 60,
+          "homework_avg": 62,
+          "attendance": 78,
+          "weighted_average": 58.0,
+          "letter_grade": "FD",
+          "status": "passed"
+        },
+        {
+          "course_id": "CENG201",
+          "semester_id": "2024-SPRING",
+          "midterm_score": 52,
+          "final_score": 55,
+          "homework_avg": 58,
+          "project_score": 60,
+          "attendance": 72,
+          "weighted_average": 53.8,
+          "letter_grade": "FD",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH201",
+          "semester_id": "2024-FALL",
+          "midterm_score": 48,
+          "final_score": null,
+          "homework_avg": 52,
+          "attendance": 70,
+          "weighted_average": null,
+          "letter_grade": null,
+          "status": "in_progress"
+        },
+        {
+          "course_id": "MATH202",
+          "semester_id": "2024-FALL",
+          "midterm_score": 55,
+          "final_score": null,
+          "homework_avg": 58,
+          "attendance": 75,
+          "weighted_average": null,
+          "letter_grade": null,
+          "status": "in_progress"
+        }
+      ]
+    },
+    {
+      "id": "STU004",
+      "name": "Sarah Anderson",
+      "email": "sarah.anderson@tu.edu",
+      "department_id": "SENG",
+      "enrollment_year": 2021,
+      "current_semester": 7,
+      "status": "active",
+      "gpa": 3.20,
+      "completed_credits": 118,
+      "advisor_notes": "Senior student, on track for graduation, interested in DevOps career",
+      "enrollments": [
+        {
+          "course_id": "SENG101",
+          "semester_id": "2022-FALL",
+          "midterm_score": 78,
+          "final_score": 82,
+          "homework_avg": 85,
+          "attendance": 95,
+          "weighted_average": 80.4,
+          "letter_grade": "BB",
+          "status": "passed"
+        },
+        {
+          "course_id": "SENG102",
+          "semester_id": "2022-FALL",
+          "midterm_score": 80,
+          "final_score": 85,
+          "homework_avg": 88,
+          "project_score": 90,
+          "attendance": 98,
+          "weighted_average": 83.0,
+          "letter_grade": "BB",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH101",
+          "semester_id": "2022-FALL",
+          "midterm_score": 72,
+          "final_score": 78,
+          "homework_avg": 80,
+          "attendance": 90,
+          "weighted_average": 75.6,
+          "letter_grade": "CB",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH102",
+          "semester_id": "2023-SPRING",
+          "midterm_score": 70,
+          "final_score": 75,
+          "homework_avg": 78,
+          "attendance": 88,
+          "weighted_average": 73.0,
+          "letter_grade": "CC",
+          "status": "passed"
+        },
+        {
+          "course_id": "SENG201",
+          "semester_id": "2023-FALL",
+          "midterm_score": 82,
+          "final_score": 85,
+          "homework_avg": 88,
+          "project_score": 90,
+          "attendance": 96,
+          "weighted_average": 83.8,
+          "letter_grade": "BB",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH201",
+          "semester_id": "2023-FALL",
+          "midterm_score": 68,
+          "final_score": 72,
+          "homework_avg": 75,
+          "attendance": 85,
+          "weighted_average": 70.4,
+          "letter_grade": "CC",
+          "status": "passed"
+        },
+        {
+          "course_id": "SENG202",
+          "semester_id": "2024-SPRING",
+          "midterm_score": 85,
+          "final_score": 88,
+          "homework_avg": 90,
+          "project_score": 92,
+          "attendance": 98,
+          "weighted_average": 86.8,
+          "letter_grade": "BA",
+          "status": "passed"
+        },
+        {
+          "course_id": "SENG301",
+          "semester_id": "2024-SPRING",
+          "midterm_score": 80,
+          "final_score": 84,
+          "homework_avg": 86,
+          "project_score": 88,
+          "attendance": 94,
+          "weighted_average": 82.4,
+          "letter_grade": "BB",
+          "status": "passed"
+        },
+        {
+          "course_id": "SENG302",
+          "semester_id": "2024-SPRING",
+          "midterm_score": 78,
+          "final_score": 82,
+          "homework_avg": 85,
+          "project_score": 88,
+          "attendance": 92,
+          "weighted_average": 80.4,
+          "letter_grade": "BB",
+          "status": "passed"
+        },
+        {
+          "course_id": "SENG401",
+          "semester_id": "2024-FALL",
+          "midterm_score": 86,
+          "final_score": null,
+          "homework_avg": 90,
+          "project_score": null,
+          "attendance": 100,
+          "weighted_average": null,
+          "letter_grade": null,
+          "status": "in_progress"
+        }
+      ]
+    },
+    {
+      "id": "STU005",
+      "name": "James Taylor",
+      "email": "james.taylor@tu.edu",
+      "department_id": "CENG",
+      "enrollment_year": 2023,
+      "current_semester": 3,
+      "status": "warning",
+      "gpa": 1.95,
+      "completed_credits": 28,
+      "advisor_notes": "At-risk student - GPA below minimum, recommended for tutoring",
+      "enrollments": [
+        {
+          "course_id": "MATH101",
+          "semester_id": "2023-FALL",
+          "midterm_score": 50,
+          "final_score": 55,
+          "homework_avg": 58,
+          "attendance": 75,
+          "weighted_average": 53.0,
+          "letter_grade": "FD",
+          "status": "passed"
+        },
+        {
+          "course_id": "CENG101",
+          "semester_id": "2023-FALL",
+          "midterm_score": 58,
+          "final_score": 62,
+          "homework_avg": 65,
+          "project_score": 68,
+          "attendance": 80,
+          "weighted_average": 60.4,
+          "letter_grade": "DD",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH102",
+          "semester_id": "2024-SPRING",
+          "midterm_score": 45,
+          "final_score": 48,
+          "homework_avg": 52,
+          "attendance": 70,
+          "weighted_average": 46.8,
+          "letter_grade": "FF",
+          "status": "failed"
+        },
+        {
+          "course_id": "CENG102",
+          "semester_id": "2024-SPRING",
+          "midterm_score": 55,
+          "final_score": 60,
+          "homework_avg": 62,
+          "project_score": 65,
+          "attendance": 78,
+          "weighted_average": 58.0,
+          "letter_grade": "FD",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH102",
+          "semester_id": "2024-FALL",
+          "midterm_score": 52,
+          "final_score": null,
+          "homework_avg": 55,
+          "attendance": 82,
+          "weighted_average": null,
+          "letter_grade": null,
+          "status": "in_progress"
+        },
+        {
+          "course_id": "CENG201",
+          "semester_id": "2024-FALL",
+          "midterm_score": 60,
+          "final_score": null,
+          "homework_avg": 65,
+          "project_score": null,
+          "attendance": 85,
+          "weighted_average": null,
+          "letter_grade": null,
+          "status": "in_progress"
+        },
+        {
+          "course_id": "MATH202",
+          "semester_id": "2024-FALL",
+          "midterm_score": 55,
+          "final_score": null,
+          "homework_avg": 58,
+          "attendance": 80,
+          "weighted_average": null,
+          "letter_grade": null,
+          "status": "in_progress"
+        }
+      ]
+    },
+    {
+      "id": "STU006",
+      "name": "Lisa Martinez",
+      "email": "lisa.martinez@tu.edu",
+      "department_id": "SENG",
+      "enrollment_year": 2022,
+      "current_semester": 5,
+      "status": "active",
+      "gpa": 2.85,
+      "completed_credits": 65,
+      "advisor_notes": "Showing improvement trend - started weak but grades improving each semester",
+      "enrollments": [
+        {
+          "course_id": "SENG101",
+          "semester_id": "2022-FALL",
+          "midterm_score": 58,
+          "final_score": 62,
+          "homework_avg": 65,
+          "attendance": 80,
+          "weighted_average": 60.4,
+          "letter_grade": "DD",
+          "status": "passed"
+        },
+        {
+          "course_id": "SENG102",
+          "semester_id": "2022-FALL",
+          "midterm_score": 62,
+          "final_score": 68,
+          "homework_avg": 70,
+          "project_score": 72,
+          "attendance": 85,
+          "weighted_average": 65.6,
+          "letter_grade": "DC",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH101",
+          "semester_id": "2022-FALL",
+          "midterm_score": 55,
+          "final_score": 60,
+          "homework_avg": 62,
+          "attendance": 78,
+          "weighted_average": 58.0,
+          "letter_grade": "FD",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH102",
+          "semester_id": "2023-SPRING",
+          "midterm_score": 62,
+          "final_score": 68,
+          "homework_avg": 70,
+          "attendance": 82,
+          "weighted_average": 65.6,
+          "letter_grade": "DC",
+          "status": "passed"
+        },
+        {
+          "course_id": "SENG201",
+          "semester_id": "2023-FALL",
+          "midterm_score": 70,
+          "final_score": 75,
+          "homework_avg": 78,
+          "project_score": 80,
+          "attendance": 90,
+          "weighted_average": 73.0,
+          "letter_grade": "CC",
+          "status": "passed"
+        },
+        {
+          "course_id": "MATH201",
+          "semester_id": "2023-FALL",
+          "midterm_score": 65,
+          "final_score": 70,
+          "homework_avg": 72,
+          "attendance": 85,
+          "weighted_average": 68.0,
+          "letter_grade": "DC",
+          "status": "passed"
+        },
+        {
+          "course_id": "SENG202",
+          "semester_id": "2024-SPRING",
+          "midterm_score": 78,
+          "final_score": 82,
+          "homework_avg": 85,
+          "project_score": 88,
+          "attendance": 94,
+          "weighted_average": 80.4,
+          "letter_grade": "BB",
+          "status": "passed"
+        },
+        {
+          "course_id": "SENG301",
+          "semester_id": "2024-FALL",
+          "midterm_score": 82,
+          "final_score": null,
+          "homework_avg": 86,
+          "project_score": null,
+          "attendance": 96,
+          "weighted_average": null,
+          "letter_grade": null,
+          "status": "in_progress"
+        },
+        {
+          "course_id": "SENG302",
+          "semester_id": "2024-FALL",
+          "midterm_score": 80,
+          "final_score": null,
+          "homework_avg": 84,
+          "project_score": null,
+          "attendance": 94,
+          "weighted_average": null,
+          "letter_grade": null,
+          "status": "in_progress"
+        }
+      ]
+    }
+  ]
+}

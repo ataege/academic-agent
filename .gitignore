@@ -1,0 +1,19 @@
+# Environment variables
+.env
+
+# Reports (generated daily)
+reports/
+
+# Deno cache
+.deno/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

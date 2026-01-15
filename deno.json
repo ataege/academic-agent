@@ -1,0 +1,24 @@
+{
+  "name": "@academic/advisor-agent",
+  "version": "1.0.0",
+  "exports": "./main.ts",
+  "tasks": {
+    "dev": "deno run --allow-read --allow-env --allow-net main.ts",
+    "student": "deno run --allow-read --allow-env --allow-net main.ts --mode=student",
+    "dean": "deno run --allow-read --allow-env --allow-net main.ts --mode=dean",
+    "report": "deno run --allow-read --allow-env --allow-net --allow-write main.ts --mode=report",
+    "test": "deno test --allow-read --allow-env tests/",
+    "cache": "deno cache main.ts"
+  },
+  "imports": {
+    "@langchain/core": "npm:@langchain/core@^0.3.0",
+    "@langchain/openai": "npm:@langchain/openai@^0.3.0",
+    "@langchain/langgraph": "npm:@langchain/langgraph@^0.2.0",
+    "langchain": "npm:langchain@^0.3.0",
+    "zod": "npm:zod@^3.23.0"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "lib": ["deno.window", "ES2022"]
+  }
+}
