@@ -19,7 +19,7 @@ import {
 export function createDeanTools(data: AcademicData) {
   // Tool 1: Get all at-risk students
   const getAllAtRiskStudents = tool(
-    async () => {
+    () => {
       const atRiskStudents = getAtRiskStudents(data);
       const summary = summarizeRiskStatus(data);
 
@@ -56,7 +56,7 @@ export function createDeanTools(data: AcademicData) {
 
   // Tool 2: Get department statistics
   const getDepartmentStats = tool(
-    async ({ departmentId }) => {
+    ({ departmentId }) => {
       const stats = getDepartmentStatistics(departmentId, data);
 
       return JSON.stringify({
@@ -94,7 +94,7 @@ export function createDeanTools(data: AcademicData) {
 
   // Tool 3: Get institution overview
   const getInstitutionOverviewTool = tool(
-    async () => {
+    () => {
       const overview = getInstitutionOverview(data);
       const comparison = compareDepartments(data);
 
@@ -124,7 +124,7 @@ export function createDeanTools(data: AcademicData) {
 
   // Tool 4: Get course performance report
   const getCoursePerformanceReport = tool(
-    async ({ courseId }) => {
+    ({ courseId }) => {
       const course = findCourse(data, courseId);
       if (!course) {
         return JSON.stringify({ error: `Course not found: ${courseId}` });
@@ -188,7 +188,7 @@ export function createDeanTools(data: AcademicData) {
 
   // Tool 5: Get student details
   const getStudentDetails = tool(
-    async ({ studentId }) => {
+    ({ studentId }) => {
       const student = findStudent(data, studentId);
       if (!student) {
         return JSON.stringify({ error: `Student not found: ${studentId}` });
@@ -251,7 +251,7 @@ export function createDeanTools(data: AcademicData) {
 
   // Tool 6: Generate intervention recommendations
   const getInterventionRecommendations = tool(
-    async () => {
+    () => {
       const atRiskStudents = getAtRiskStudents(data);
       const criticalStudents = atRiskStudents.filter(
         (s) => s.riskLevel === "critical"

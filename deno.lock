@@ -3,6 +3,7 @@
   "specifiers": {
     "jsr:@std/assert@1": "1.0.19",
     "jsr:@std/dotenv@*": "0.225.6",
+    "jsr:@std/dotenv@~0.225.6": "0.225.6",
     "jsr:@std/internal@^1.0.12": "1.0.14",
     "npm:@langchain/anthropic@~0.3.34": "0.3.34_@langchain+core@0.3.80_zod@3.25.76",
     "npm:@langchain/core@0.3": "0.3.80_zod@3.25.76",
@@ -524,6 +525,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@1",
+      "jsr:@std/dotenv@~0.225.6",
       "npm:@langchain/anthropic@~0.3.34",
       "npm:@langchain/core@0.3",
       "npm:@langchain/langgraph@0.2",

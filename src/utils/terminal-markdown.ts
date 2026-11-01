@@ -27,7 +27,7 @@ const ANSI = {
  * Render markdown text to ANSI-styled terminal output
  */
 export function renderMarkdown(markdown: string): string {
-  let result = markdown;
+  const result = markdown;
 
   // Process line by line for block elements
   const lines = result.split("\n");

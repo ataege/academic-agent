@@ -1,5 +1,4 @@
 import type {
-  AcademicData,
   Enrollment,
   GradeScaleEntry,
   GradeWeights,
@@ -174,7 +173,7 @@ export function projectSemesterGPA(
  */
 export function calculateRequiredScores(
   enrollments: Enrollment[],
-  courses: Course[],
+  _courses: Course[],
   targetGPA: number,
   gradingScale: Record<string, GradeScaleEntry>,
   weights: GradeWeights

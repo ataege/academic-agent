@@ -1,4 +1,4 @@
-import { load } from "jsr:@std/dotenv";
+import { load } from "@std/dotenv";
 import { loadAcademicData } from "./src/data/loader.ts";
 import { createStudentAgent, getStudentInfo } from "./src/agents/student-agent.ts";
 import { createDeanAgent } from "./src/agents/dean-agent.ts";
@@ -271,7 +271,7 @@ async function main(): Promise<void> {
   try {
     await initializeCourseVectorStore(data);
     console.log(`${colors.green}✓${colors.reset} Course search ready\n`);
-  } catch (error) {
+  } catch {
     console.log(`${colors.yellow}⚠️  Course search initialization skipped (needs OPENAI_API_KEY for embeddings)${colors.reset}\n`);
   }
 
@@ -331,7 +331,7 @@ async function main(): Promise<void> {
       }
       case "4": {
         console.log(`\n${colors.cyan}Goodbye! 👋${colors.reset}\n`);
-        Deno.exit(0);
+        return Deno.exit(0);
       }
       default:
         console.log(`${colors.red}Invalid choice. Please enter 1-4.${colors.reset}`);

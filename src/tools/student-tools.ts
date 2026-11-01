@@ -5,7 +5,7 @@ import { findStudent, findCourse, getCurrentEnrollments } from "../data/loader.t
 import { assessStudentRisk } from "../analysis/risk-assessment.ts";
 import { calculateGraduationProgress, getRecommendedNextCourses, getGraduationTimeline } from "../analysis/graduation.ts";
 import { predictFinalGrade } from "../analysis/gpa-calculator.ts";
-import { searchCourses, getPersonalizedRecommendations } from "../rag/course-retriever.ts";
+import { getPersonalizedRecommendations } from "../rag/course-retriever.ts";
 
 /**
  * Create student-specific tools bound to a specific student
@@ -19,7 +19,7 @@ export function createStudentTools(data: AcademicData, studentId: string) {
 
   // Tool 1: Get student profile and academic standing
   const getStudentProfile = tool(
-    async () => {
+    () => {
       const riskAssessment = assessStudentRisk(student, data);
       const department = data.departments.find(
         (d) => d.id === student.department_id
@@ -49,7 +49,7 @@ export function createStudentTools(data: AcademicData, studentId: string) {
 
   // Tool 2: Get current semester courses and grades
   const getCurrentCourses = tool(
-    async () => {
+    () => {
       const currentEnrollments = getCurrentEnrollments(student);
 
       const coursesWithDetails = currentEnrollments.map((enrollment) => {
@@ -80,7 +80,7 @@ export function createStudentTools(data: AcademicData, studentId: string) {
 
   // Tool 3: Identify at-risk courses
   const getAtRiskCourses = tool(
-    async () => {
+    () => {
       const currentEnrollments = getCurrentEnrollments(student);
 
       const atRiskCourses = currentEnrollments
@@ -126,7 +126,7 @@ export function createStudentTools(data: AcademicData, studentId: string) {
 
   // Tool 4: Get graduation progress
   const getGraduationProgress = tool(
-    async () => {
+    () => {
       const progress = calculateGraduationProgress(student, data);
       const timeline = getGraduationTimeline(student, data);
 
@@ -159,13 +159,23 @@ export function createStudentTools(data: AcademicData, studentId: string) {
 
   // Tool 5: Get course history
   const getCourseHistory = tool(
-    async () => {
+    () => {
       const completedEnrollments = student.enrollments.filter(
         (e) => e.status !== "in_progress"
       );
 
       // Group by semester
-      const bySemester: Record<string, any[]> = {};
+      const bySemester: Record<
+        string,
+        {
+          courseCode: string;
+          courseName: string;
+          grade: string | null;
+          score: number | null;
+          status: string;
+          credits: number;
+        }[]
+      > = {};
       for (const enrollment of completedEnrollments) {
         const semesterName =
           data.semesters.find((s) => s.id === enrollment.semester_id)?.name ??
@@ -203,7 +213,7 @@ export function createStudentTools(data: AcademicData, studentId: string) {
 
   // Tool 6: Get personalized recommendations
   const getRecommendations = tool(
-    async () => {
+    () => {
       const riskAssessment = assessStudentRisk(student, data);
       const graduationProgress = calculateGraduationProgress(student, data);
       const nextCourses = getRecommendedNextCourses(student, data, 4);
