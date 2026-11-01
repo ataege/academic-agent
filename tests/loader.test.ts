@@ -173,3 +173,13 @@ Deno.test("getAvailableCourses returns nothing for an unknown department", () =>
     [],
   );
 });
+
+Deno.test("loadAcademicData doesn't serve one file's data for another path", async () => {
+  clearDataCache();
+  await loadAcademicData();
+
+  const otherData = await loadAcademicData(fixturePath("empty-data.json"));
+
+  assertEquals(otherData.students, []);
+  clearDataCache();
+});

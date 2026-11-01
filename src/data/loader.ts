@@ -5,6 +5,7 @@ const DEFAULT_DATA_PATH = "./data/academic_data.json";
 
 // Cached data to avoid repeated file reads
 let cachedData: AcademicData | null = null;
+let cachedPath: string | null = null;
 
 /**
  * Load and parse academic data from JSON file
@@ -14,7 +15,7 @@ export async function loadAcademicData(
   path: string = DEFAULT_DATA_PATH
 ): Promise<AcademicData> {
   // Return cached data if available
-  if (cachedData) {
+  if (cachedData && cachedPath === path) {
     return cachedData;
   }
 
@@ -29,6 +30,7 @@ export async function loadAcademicData(
 
     // Cache for future use
     cachedData = data;
+    cachedPath = path;
     return data;
   } catch (error) {
     if (error instanceof Deno.errors.NotFound) {
@@ -43,6 +45,7 @@ export async function loadAcademicData(
  */
 export function clearDataCache(): void {
   cachedData = null;
+  cachedPath = null;
 }
 
 /**
