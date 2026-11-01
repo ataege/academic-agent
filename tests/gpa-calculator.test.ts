@@ -264,3 +264,19 @@ Deno.test("predictFinalGrade treats a grade already secured as achievable", () =
   assertEquals(prediction.achievable, true);
   assertEquals(prediction.requiredFinal, 0);
 });
+
+Deno.test("calculateRequiredScores reports a GPA above the scale as out of reach", () => {
+  assertEquals(
+    calculateRequiredScores(
+      sampleStudent("STU002").enrollments,
+      courses,
+      4.5,
+      gradingScale,
+      gradeWeights,
+    ),
+    [
+      { courseId: "CENG301", requiredFinal: 0, achievable: false },
+      { courseId: "CENG360", requiredFinal: 0, achievable: false },
+    ],
+  );
+});

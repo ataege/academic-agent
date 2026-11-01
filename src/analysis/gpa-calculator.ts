@@ -184,9 +184,18 @@ export function calculateRequiredScores(
   // Find the minimum grade that would give us our target GPA
   const targetGrade = Object.entries(gradingScale)
     .filter(([, entry]) => entry.gpa >= targetGPA)
-    .sort(([, a], [, b]) => a.gpa - b.gpa)[0]?.[0] || "CC";
+    .sort(([, a], [, b]) => a.gpa - b.gpa)[0]?.[0];
 
   return currentEnrollments.map((enrollment) => {
+    // No grade reaches this GPA, so the target is out of reach in every course
+    if (!targetGrade) {
+      return {
+        courseId: enrollment.course_id,
+        requiredFinal: 0,
+        achievable: false,
+      };
+    }
+
     const prediction = predictFinalGrade(
       enrollment.midterm_score!,
       targetGrade,
