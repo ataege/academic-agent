@@ -9,6 +9,7 @@ import {
   projectSemesterGPA,
 } from "../src/analysis/gpa-calculator.ts";
 import {
+  failedCourse,
   makeEnrollment,
   passedCourse,
   sampleData,
@@ -278,5 +279,37 @@ Deno.test("calculateRequiredScores reports a GPA above the scale as out of reach
       { courseId: "CENG301", requiredFinal: 0, achievable: false },
       { courseId: "CENG360", requiredFinal: 0, achievable: false },
     ],
+  );
+});
+
+Deno.test("calculateGPA counts a failed course at its grade", () => {
+  const enrollments = [
+    passedCourse("MATH101", "AA"), // 4 credits at 4.0
+    failedCourse("CENG350"), // 3 credits at 0.0
+  ];
+
+  assertAlmostEquals(
+    calculateGPA(enrollments, courses, gradingScale),
+    16 / 7,
+    1e-9,
+  );
+});
+
+Deno.test("calculateGPA lets a retake replace the earlier attempt", () => {
+  const enrollments = [failedCourse("MATH101"), passedCourse("MATH101", "BB")];
+  assertEquals(calculateGPA(enrollments, courses, gradingScale), 3);
+
+  const passedTwice = [
+    passedCourse("MATH101", "BB"),
+    passedCourse("MATH101", "CC"),
+  ];
+  assertEquals(calculateGPA(passedTwice, courses, gradingScale), 2);
+});
+
+Deno.test("calculateGPA keeps a failure until the retake is finished", () => {
+  // STU005: FD and DD and FD on 4 credits each, plus MATH102 failed and in progress
+  assertEquals(
+    calculateGPA(sampleStudent("STU005").enrollments, courses, gradingScale),
+    0.5,
   );
 });

@@ -58,17 +58,19 @@ export function calculateGPA(
   courses: Course[],
   gradingScale: Record<string, GradeScaleEntry>
 ): number {
-  // Only include completed courses with grades
-  const completedEnrollments = enrollments.filter(
-    (e) => e.status === "passed" && e.letter_grade
-  );
-
-  if (completedEnrollments.length === 0) return 0;
+  // Count each course's latest completed attempt, so a failure stays at its grade
+  // until a retake replaces it. Enrollments are stored in chronological order.
+  const latestAttempts = new Map<string, Enrollment>();
+  for (const enrollment of enrollments) {
+    if (enrollment.status !== "in_progress" && enrollment.letter_grade) {
+      latestAttempts.set(enrollment.course_id, enrollment);
+    }
+  }
 
   let totalQualityPoints = 0;
   let totalCredits = 0;
 
-  for (const enrollment of completedEnrollments) {
+  for (const enrollment of latestAttempts.values()) {
     const course = courses.find((c) => c.id === enrollment.course_id);
     if (!course || !enrollment.letter_grade) continue;
 
