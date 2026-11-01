@@ -105,7 +105,8 @@ export function predictFinalGrade(
   // final = (targetMin - midterm * weightMid) / weightFinal
   const requiredFinal =
     (targetMin - midtermScore * weights.midterm) / weights.final;
-  const roundedRequired = Math.ceil(requiredFinal);
+  // Tolerance stops float noise (82.00000000000001) asking for an extra point
+  const roundedRequired = Math.ceil(requiredFinal - 1e-9);
 
   const achievable = roundedRequired <= 100 && roundedRequired >= 0;
 

@@ -238,3 +238,17 @@ Deno.test("getLetterGrade agrees with every stored sample grade", () => {
     );
   }
 });
+
+Deno.test("predictFinalGrade isn't pushed up a point by float noise", () => {
+  // Each pair lands exactly on the target: 0.4 * 52 + 0.6 * 82 = 70
+  const exactFinals: [number, number][] = [[52, 82], [67, 72], [91, 56]];
+
+  for (const [midterm, requiredFinal] of exactFinals) {
+    assertEquals(
+      predictFinalGrade(midterm, "CC", gradeWeights, gradingScale)
+        .requiredFinal,
+      requiredFinal,
+      `midterm ${midterm}`,
+    );
+  }
+});
