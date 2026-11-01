@@ -11,6 +11,7 @@
     "cache": "deno cache main.ts"
   },
   "imports": {
+    "@langchain/anthropic": "npm:@langchain/anthropic@^0.3.34",
     "@langchain/core": "npm:@langchain/core@^0.3.0",
     "@langchain/openai": "npm:@langchain/openai@^0.3.0",
     "@langchain/langgraph": "npm:@langchain/langgraph@^0.2.0",

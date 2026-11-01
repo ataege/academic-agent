@@ -4,10 +4,11 @@
     "jsr:@std/assert@1": "1.0.19",
     "jsr:@std/dotenv@*": "0.225.6",
     "jsr:@std/internal@^1.0.12": "1.0.14",
+    "npm:@langchain/anthropic@~0.3.34": "0.3.34_@langchain+core@0.3.80_zod@3.25.76",
     "npm:@langchain/core@0.3": "0.3.80_zod@3.25.76",
     "npm:@langchain/langgraph@0.2": "0.2.74_@langchain+core@0.3.80",
     "npm:@langchain/openai@0.3": "0.3.17_@langchain+core@0.3.80_zod@3.25.76_openai@4.104.0",
-    "npm:langchain@0.3": "0.3.37_@langchain+core@0.3.80_zod@3.25.76",
+    "npm:langchain@0.3": "0.3.37_@langchain+anthropic@0.3.34_@langchain+core@0.3.80",
     "npm:zod@^3.23.0": "3.25.76"
   },
   "jsr": {
@@ -25,8 +26,30 @@
     }
   },
   "npm": {
+    "@anthropic-ai/sdk@0.65.0_zod@3.25.76": {
+      "integrity": "sha512-zIdPOcrCVEI8t3Di40nH4z9EoeyGZfXbYSvWdDLsB/KkaSYMnEgC7gmcgWu83g2NTn1ZTpbMvpdttWDGGIk6zw==",
+      "dependencies": [
+        "json-schema-to-ts",
+        "zod"
+      ],
+      "optionalPeers": [
+        "zod"
+      ],
+      "bin": true
+    },
+    "@babel/runtime@7.29.10": {
+      "integrity": "sha512-NpugTzbKgGrNe45Ui32cN8vCFFMxVtP/9rtfwv0nP5FRDAjvYBxJcLVpYA9mr1jxP6cnIT7x9LUzuDTbWYYNRA=="
+    },
     "@cfworker/json-schema@4.1.1": {
       "integrity": "sha512-gAmrUZSGtKc3AiBL71iNWxDsyUC5uMaKKGdvzYsBoTW/xi42JQHl7eKV2OYzCUqvc+D2RCcf7EXY2iCyFIk6og=="
+    },
+    "@langchain/anthropic@0.3.34_@langchain+core@0.3.80_zod@3.25.76": {
+      "integrity": "sha512-8bOW1A2VHRCjbzdYElrjxutKNs9NSIxYRGtR+OJWVzluMqoKKh2NmmFrpPizEyqCUEG2tTq5xt6XA1lwfqMJRA==",
+      "dependencies": [
+        "@anthropic-ai/sdk",
+        "@langchain/core",
+        "fast-xml-parser"
+      ]
     },
     "@langchain/core@0.3.80_zod@3.25.76": {
       "integrity": "sha512-vcJDV2vk1AlCwSh3aBm/urQ1ZrlXFFBocv11bz/NBUfLWD5/UDNMzwPdaAd2dKvNmTWa9FM2lirLU3+JCf4cRA==",
@@ -223,6 +246,13 @@
     "eventemitter3@4.0.7": {
       "integrity": "sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw=="
     },
+    "fast-xml-parser@4.5.7": {
+      "integrity": "sha512-a6Qh1RMCNbSrU1+sAyAAZH3rTe+OaWJbNZIq0S+ifZciUUOQtlVxBJwoTUE2bYhysmG/RYyI5WJFIKdBahJdrQ==",
+      "dependencies": [
+        "strnum"
+      ],
+      "bin": true
+    },
     "form-data-encoder@1.7.2": {
       "integrity": "sha512-qfqtYan3rxrnCk1VYaA4H+Ms9xdpPqvLZa6xmMgFvhO32x7/3J/ExcTd6qpxM0vH2GdMI+poehyBZvqfMTto8A=="
     },
@@ -308,12 +338,20 @@
       ],
       "bin": true
     },
+    "json-schema-to-ts@3.1.1": {
+      "integrity": "sha512-+DWg8jCJG2TEnpy7kOm/7/AxaYoaRbjVB4LFZLySZlWn8exGs3A4OLJR966cVvU26N7X9TWxl+Jsw7dzAqKT6g==",
+      "dependencies": [
+        "@babel/runtime",
+        "ts-algebra"
+      ]
+    },
     "jsonpointer@5.0.1": {
       "integrity": "sha512-p/nXbhSEcu3pZRdkW1OfJhpsVtW1gd4Wa1fnQc9YLiTfAjn0312eMKimbdIQzuZl9aa9xUGaRlP9T/CJE/ditQ=="
     },
-    "langchain@0.3.37_@langchain+core@0.3.80_zod@3.25.76": {
+    "langchain@0.3.37_@langchain+anthropic@0.3.34_@langchain+core@0.3.80": {
       "integrity": "sha512-1jPsZ6xsxkcQPUvqRjvfuOLwZLLyt49hzcOK7OYAJovIkkOxd5gzK4Yw6giPUQ8g4XHyvULNlWBz+subdkcokw==",
       "dependencies": [
+        "@langchain/anthropic",
         "@langchain/core",
         "@langchain/openai",
         "@langchain/textsplitters",
@@ -326,6 +364,9 @@
         "uuid@10.0.0",
         "yaml",
         "zod"
+      ],
+      "optionalPeers": [
+        "@langchain/anthropic"
       ]
     },
     "langsmith@0.3.87_openai@4.104.0_zod@3.25.76": {
@@ -425,6 +466,9 @@
     "simple-wcswidth@1.1.2": {
       "integrity": "sha512-j7piyCjAeTDSjzTSQ7DokZtMNwNlEAyxqSZeCS+CXH7fJ4jx3FuJ/mTW3mE+6JLs4VJBbcll0Kjn+KXI5t21Iw=="
     },
+    "strnum@1.1.2": {
+      "integrity": "sha512-vrN+B7DBIoTTZjnPNewwhx6cBA/H+IS7rfW68n7XxC1y7uoiGQBxaKzqucGUgavX15dJgiGztLJ8vxuEzwqBdA=="
+    },
     "supports-color@7.2.0": {
       "integrity": "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==",
       "dependencies": [
@@ -433,6 +477,9 @@
     },
     "tr46@0.0.3": {
       "integrity": "sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw=="
+    },
+    "ts-algebra@2.0.0": {
+      "integrity": "sha512-FPAhNPFMrkwz76P7cdjdmiShwMynZYN6SgOujD1urY4oNm80Ou9oMdmbR45LotcKOXoy7wSmHkRFE6Mxbrhefw=="
     },
     "undici-types@5.26.5": {
       "integrity": "sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA=="
@@ -477,6 +524,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@1",
+      "npm:@langchain/anthropic@~0.3.34",
       "npm:@langchain/core@0.3",
       "npm:@langchain/langgraph@0.2",
       "npm:@langchain/openai@0.3",

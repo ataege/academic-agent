@@ -2,7 +2,7 @@ import { load } from "jsr:@std/dotenv";
 import { loadAcademicData } from "./src/data/loader.ts";
 import { createStudentAgent, getStudentInfo } from "./src/agents/student-agent.ts";
 import { createDeanAgent } from "./src/agents/dean-agent.ts";
-import { executeQuery } from "./src/agents/base-agent.ts";
+import { executeQuery, getLLMSelection } from "./src/agents/base-agent.ts";
 import { generateDailyReports } from "./src/scheduler/report-generator.ts";
 import { initializeCourseVectorStore } from "./src/rag/course-retriever.ts";
 import { renderMarkdown } from "./src/utils/terminal-markdown.ts";
@@ -65,14 +65,15 @@ function parseArgs(): CLIArgs {
 /**
  * Display the welcome banner
  */
-function showBanner(): void {
+function showBanner(model: string): void {
+  const poweredBy = `Powered by LangChain + ${model}`.padEnd(59);
   console.log(`${colors.cyan}
 ╔════════════════════════════════════════════════════════════════╗
 ║                                                                ║
 ║     ${colors.bright}Academic Advisor AI Agent${colors.reset}${colors.cyan}                             ║
 ║     ${colors.dim}Tech University - 2024-2025${colors.reset}${colors.cyan}                            ║
 ║                                                                ║
-║     ${colors.yellow}Powered by LangChain + OpenAI GPT-4o${colors.reset}${colors.cyan}                    ║
+║     ${colors.yellow}${poweredBy}${colors.reset}${colors.cyan}║
 ║                                                                ║
 ╚════════════════════════════════════════════════════════════════╝
 ${colors.reset}`);
@@ -186,7 +187,7 @@ async function chatLoop(
       if (error instanceof Error) {
         console.log(`${colors.red}❌ Error: ${error.message}${colors.reset}`);
         if (error.message.includes("API key")) {
-          console.log(`${colors.yellow}💡 Tip: Make sure OPENAI_API_KEY is set in your .env file${colors.reset}`);
+          console.log(`${colors.yellow}💡 Tip: Make sure ${getLLMSelection().apiKeyEnvVar} is set in your .env file${colors.reset}`);
         }
       }
     }
@@ -241,13 +242,13 @@ async function runReportMode(): Promise<void> {
  * Main application entry point
  */
 async function main(): Promise<void> {
-  showBanner();
+  const { model, apiKeyEnvVar } = getLLMSelection();
+  showBanner(model);
 
-  // Check for API key
-  const apiKey = Deno.env.get("OPENAI_API_KEY");
-  if (!apiKey) {
-    console.log(`${colors.yellow}⚠️  Warning: OPENAI_API_KEY not found in environment${colors.reset}`);
-    console.log(`${colors.dim}   Set it in .env file or export OPENAI_API_KEY=your_key${colors.reset}\n`);
+  // Check for the selected provider's API key
+  if (!Deno.env.get(apiKeyEnvVar)) {
+    console.log(`${colors.yellow}⚠️  Warning: ${apiKeyEnvVar} not found in environment${colors.reset}`);
+    console.log(`${colors.dim}   Set it in .env file or export ${apiKeyEnvVar}=your_key${colors.reset}\n`);
   }
 
   // Load academic data
@@ -271,7 +272,7 @@ async function main(): Promise<void> {
     await initializeCourseVectorStore(data);
     console.log(`${colors.green}✓${colors.reset} Course search ready\n`);
   } catch (error) {
-    console.log(`${colors.yellow}⚠️  Course search initialization skipped (API key required)${colors.reset}\n`);
+    console.log(`${colors.yellow}⚠️  Course search initialization skipped (needs OPENAI_API_KEY for embeddings)${colors.reset}\n`);
   }
 
   // Parse CLI arguments
