@@ -1,38 +1,32 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@std/assert@1": "1.0.19",
     "jsr:@std/dotenv@*": "0.225.6",
+    "jsr:@std/internal@^1.0.12": "1.0.14",
     "npm:@langchain/core@0.3": "0.3.80_zod@3.25.76",
-    "npm:@langchain/langgraph@0.2": "0.2.74_@langchain+core@0.3.80__zod@3.25.76",
-    "npm:@langchain/openai@0.3": "0.3.17_@langchain+core@0.3.80__zod@3.25.76_zod@3.25.76_openai@4.104.0__zod@3.25.76",
-    "npm:langchain@0.3": "0.3.37_@langchain+core@0.3.80__zod@3.25.76_zod@3.25.76",
+    "npm:@langchain/langgraph@0.2": "0.2.74_@langchain+core@0.3.80",
+    "npm:@langchain/openai@0.3": "0.3.17_@langchain+core@0.3.80_zod@3.25.76_openai@4.104.0",
+    "npm:langchain@0.3": "0.3.37_@langchain+core@0.3.80_zod@3.25.76",
     "npm:zod@^3.23.0": "3.25.76"
   },
   "jsr": {
+    "@std/assert@1.0.19": {
+      "integrity": "eaada96ee120cb980bc47e040f82814d786fe8162ecc53c91d8df60b8755991e",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
     "@std/dotenv@0.225.6": {
       "integrity": "1d6f9db72f565bd26790fa034c26e45ecb260b5245417be76c2279e5734c421b"
+    },
+    "@std/internal@1.0.14": {
+      "integrity": "291516b3d4c35024d6ffbc0a9df5bf4c64116e05b50012cf846710152d2ffdf7"
     }
   },
   "npm": {
     "@cfworker/json-schema@4.1.1": {
       "integrity": "sha512-gAmrUZSGtKc3AiBL71iNWxDsyUC5uMaKKGdvzYsBoTW/xi42JQHl7eKV2OYzCUqvc+D2RCcf7EXY2iCyFIk6og=="
-    },
-    "@langchain/core@0.3.80_openai@4.104.0__zod@3.25.76_zod@3.25.76": {
-      "integrity": "sha512-vcJDV2vk1AlCwSh3aBm/urQ1ZrlXFFBocv11bz/NBUfLWD5/UDNMzwPdaAd2dKvNmTWa9FM2lirLU3+JCf4cRA==",
-      "dependencies": [
-        "@cfworker/json-schema",
-        "ansi-styles@5.2.0",
-        "camelcase",
-        "decamelize",
-        "js-tiktoken",
-        "langsmith",
-        "mustache",
-        "p-queue",
-        "p-retry",
-        "uuid@10.0.0",
-        "zod",
-        "zod-to-json-schema"
-      ]
     },
     "@langchain/core@0.3.80_zod@3.25.76": {
       "integrity": "sha512-vcJDV2vk1AlCwSh3aBm/urQ1ZrlXFFBocv11bz/NBUfLWD5/UDNMzwPdaAd2dKvNmTWa9FM2lirLU3+JCf4cRA==",
@@ -51,50 +45,50 @@
         "zod-to-json-schema"
       ]
     },
-    "@langchain/langgraph-checkpoint@0.0.18_@langchain+core@0.3.80__zod@3.25.76": {
+    "@langchain/langgraph-checkpoint@0.0.18_@langchain+core@0.3.80": {
       "integrity": "sha512-IS7zJj36VgY+4pf8ZjsVuUWef7oTwt1y9ylvwu0aLuOn1d0fg05Om9DLm3v2GZ2Df6bhLV1kfWAM0IAl9O5rQQ==",
       "dependencies": [
-        "@langchain/core@0.3.80_zod@3.25.76",
+        "@langchain/core",
         "uuid@10.0.0"
       ]
     },
-    "@langchain/langgraph-sdk@0.0.112_@langchain+core@0.3.80__zod@3.25.76": {
+    "@langchain/langgraph-sdk@0.0.112_@langchain+core@0.3.80": {
       "integrity": "sha512-/9W5HSWCqYgwma6EoOspL4BGYxGxeJP6lIquPSF4FA0JlKopaUv58ucZC3vAgdJyCgg6sorCIV/qg7SGpEcCLw==",
       "dependencies": [
-        "@langchain/core@0.3.80_zod@3.25.76",
+        "@langchain/core",
         "@types/json-schema",
         "p-queue",
         "p-retry",
         "uuid@9.0.1"
       ],
       "optionalPeers": [
-        "@langchain/core@0.3.80_zod@3.25.76"
+        "@langchain/core"
       ]
     },
-    "@langchain/langgraph@0.2.74_@langchain+core@0.3.80__zod@3.25.76": {
+    "@langchain/langgraph@0.2.74_@langchain+core@0.3.80": {
       "integrity": "sha512-oHpEi5sTZTPaeZX1UnzfM2OAJ21QGQrwReTV6+QnX7h8nDCBzhtipAw1cK616S+X8zpcVOjgOtJuaJhXa4mN8w==",
       "dependencies": [
-        "@langchain/core@0.3.80_zod@3.25.76",
+        "@langchain/core",
         "@langchain/langgraph-checkpoint",
         "@langchain/langgraph-sdk",
         "uuid@10.0.0",
         "zod"
       ]
     },
-    "@langchain/openai@0.3.17_@langchain+core@0.3.80__zod@3.25.76_zod@3.25.76_openai@4.104.0__zod@3.25.76": {
+    "@langchain/openai@0.3.17_@langchain+core@0.3.80_zod@3.25.76_openai@4.104.0": {
       "integrity": "sha512-uw4po32OKptVjq+CYHrumgbfh4NuD7LqyE+ZgqY9I/LrLc6bHLMc+sisHmI17vgek0K/yqtarI0alPJbzrwyag==",
       "dependencies": [
-        "@langchain/core@0.3.80_openai@4.104.0__zod@3.25.76_zod@3.25.76",
+        "@langchain/core",
         "js-tiktoken",
         "openai",
         "zod",
         "zod-to-json-schema"
       ]
     },
-    "@langchain/textsplitters@0.1.0_@langchain+core@0.3.80__zod@3.25.76": {
+    "@langchain/textsplitters@0.1.0_@langchain+core@0.3.80": {
       "integrity": "sha512-djI4uw9rlkAb5iMhtLED+xJebDdAG935AdP4eRTB02R7OB/act55Bj9wsskhZsvuyQRpO4O1wQOp85s6T6GWmw==",
       "dependencies": [
-        "@langchain/core@0.3.80_zod@3.25.76",
+        "@langchain/core",
         "js-tiktoken"
       ]
     },
@@ -317,10 +311,10 @@
     "jsonpointer@5.0.1": {
       "integrity": "sha512-p/nXbhSEcu3pZRdkW1OfJhpsVtW1gd4Wa1fnQc9YLiTfAjn0312eMKimbdIQzuZl9aa9xUGaRlP9T/CJE/ditQ=="
     },
-    "langchain@0.3.37_@langchain+core@0.3.80__zod@3.25.76_zod@3.25.76": {
+    "langchain@0.3.37_@langchain+core@0.3.80_zod@3.25.76": {
       "integrity": "sha512-1jPsZ6xsxkcQPUvqRjvfuOLwZLLyt49hzcOK7OYAJovIkkOxd5gzK4Yw6giPUQ8g4XHyvULNlWBz+subdkcokw==",
       "dependencies": [
-        "@langchain/core@0.3.80_zod@3.25.76",
+        "@langchain/core",
         "@langchain/openai",
         "@langchain/textsplitters",
         "js-tiktoken",
@@ -334,7 +328,7 @@
         "zod"
       ]
     },
-    "langsmith@0.3.87_openai@4.104.0__zod@3.25.76_zod@3.25.76": {
+    "langsmith@0.3.87_openai@4.104.0_zod@3.25.76": {
       "integrity": "sha512-XXR1+9INH8YX96FKWc5tie0QixWz6tOqAsAKfcJyPkE0xPep+NDz0IQLR32q4bn10QK3LqD2HN6T3n6z1YLW7Q==",
       "dependencies": [
         "@types/uuid",
@@ -445,10 +439,12 @@
     },
     "uuid@10.0.0": {
       "integrity": "sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==",
+      "deprecated": true,
       "bin": true
     },
     "uuid@9.0.1": {
       "integrity": "sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==",
+      "deprecated": true,
       "bin": true
     },
     "web-streams-polyfill@4.0.0-beta.3": {
@@ -480,6 +476,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@std/assert@1",
       "npm:@langchain/core@0.3",
       "npm:@langchain/langgraph@0.2",
       "npm:@langchain/openai@0.3",
