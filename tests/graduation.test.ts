@@ -275,3 +275,30 @@ Deno.test("calculateGraduationProgress counts an elective passed twice only once
   assertEquals(progress.electiveCredits, 3);
   assertEquals(progress.electiveCreditsNeeded, 15);
 });
+
+Deno.test("calculateGraduationProgress expects credits for finished semesters only", () => {
+  const expectedOnTrack: [string, boolean][] = [
+    ["STU001", true], // Semester 5, 72 credits, needs 63
+    ["STU002", true], // Semester 5, 68 credits, needs 63
+    ["STU003", false], // Semester 5, 52 credits, needs 63
+    ["STU004", true], // Semester 7, 118 credits, needs 94.5
+    ["STU005", false], // Semester 3, 28 credits, needs 31.5
+    ["STU006", true], // Semester 5, 65 credits, needs 63
+  ];
+
+  for (const [studentId, isOnTrack] of expectedOnTrack) {
+    assertEquals(
+      calculateGraduationProgress(sampleStudent(studentId), sampleData)
+        .isOnTrack,
+      isOnTrack,
+      studentId,
+    );
+  }
+});
+
+Deno.test("calculateGraduationProgress keeps a first-semester student on track", () => {
+  assertEquals(
+    calculateGraduationProgress(makeStudent(), sampleData).isOnTrack,
+    true,
+  );
+});

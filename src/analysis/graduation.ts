@@ -58,9 +58,10 @@ export function calculateGraduationProgress(
   const avgCreditsPerSemester = 18;
   const estimatedSemesters = Math.ceil(creditsRemaining / avgCreditsPerSemester);
 
-  // Determine if on track (within 10% of expected progress)
+  // Determine if on track (within 10% of expected progress).
+  // The current semester isn't finished, so only earlier ones count.
   const expectedProgress =
-    (student.current_semester / 8) * requirements.min_credits;
+    ((student.current_semester - 1) / 8) * requirements.min_credits;
   const isOnTrack = student.completed_credits >= expectedProgress * 0.9;
 
   // Check GPA status
