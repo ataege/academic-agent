@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "exports": "./main.ts",
   "tasks": {
-    "dev": "deno run --allow-read --allow-env --allow-net main.ts",
-    "student": "deno run --allow-read --allow-env --allow-net main.ts --mode=student",
+    "dev": "deno run --allow-read --allow-env --allow-net --allow-write main.ts",
+    "student": "deno run --allow-read --allow-env --allow-net --allow-write main.ts --mode=student",
     "dean": "deno run --allow-read --allow-env --allow-net main.ts --mode=dean",
     "report": "deno run --allow-read --allow-env --allow-net --allow-write main.ts --mode=report",
     "test": "deno test --allow-read --allow-env tests/",
