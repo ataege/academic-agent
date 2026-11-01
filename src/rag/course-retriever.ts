@@ -1,6 +1,7 @@
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { Document } from "@langchain/core/documents";
+import type { EmbeddingsInterface } from "@langchain/core/embeddings";
 import type { AcademicData, Course } from "../types/academic.ts";
 
 // Singleton vector store instance
@@ -12,7 +13,8 @@ let isInitialized = false;
  * Creates semantic search capability over course descriptions
  */
 export async function initializeCourseVectorStore(
-  data: AcademicData
+  data: AcademicData,
+  embeddings?: EmbeddingsInterface
 ): Promise<MemoryVectorStore> {
   if (vectorStore && isInitialized) {
     return vectorStore;
@@ -40,13 +42,14 @@ export async function initializeCourseVectorStore(
     });
   });
 
-  // Create embeddings instance
-  const embeddings = new OpenAIEmbeddings({
-    model: "text-embedding-3-small", // Cost-effective embedding model
-  });
-
-  // Build vector store
-  vectorStore = await MemoryVectorStore.fromDocuments(documents, embeddings);
+  // Build vector store, using OpenAI embeddings unless the caller supplies its own
+  vectorStore = await MemoryVectorStore.fromDocuments(
+    documents,
+    embeddings ??
+      new OpenAIEmbeddings({
+        model: "text-embedding-3-small", // Cost-effective embedding model
+      })
+  );
   isInitialized = true;
 
   console.log(`Vector store initialized with ${documents.length} courses`);
@@ -111,7 +114,7 @@ export async function searchCourses(
       courseName: doc.metadata.courseName as string,
       credits: doc.metadata.credits as number,
       type: doc.metadata.type as string,
-      relevanceScore: 1 - score, // Convert distance to similarity (higher = better)
+      relevanceScore: score, // MemoryVectorStore returns cosine similarity (higher = better)
       description: doc.pageContent,
     })),
   };
