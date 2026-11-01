@@ -259,7 +259,7 @@ export function createStudentTools(data: AcademicData, studentId: string) {
     async ({ query }) => {
       const results = await getPersonalizedRecommendations(
         query,
-        studentId,
+        student.id,
         data,
         3
       );
