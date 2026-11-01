@@ -252,3 +252,15 @@ Deno.test("predictFinalGrade isn't pushed up a point by float noise", () => {
     );
   }
 });
+
+Deno.test("predictFinalGrade treats a grade already secured as achievable", () => {
+  const prediction = predictFinalGrade(
+    100,
+    "FF",
+    gradeWeights,
+    gradingScale,
+  );
+
+  assertEquals(prediction.achievable, true);
+  assertEquals(prediction.requiredFinal, 0);
+});

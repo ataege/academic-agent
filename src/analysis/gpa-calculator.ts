@@ -108,19 +108,19 @@ export function predictFinalGrade(
   // Tolerance stops float noise (82.00000000000001) asking for an extra point
   const roundedRequired = Math.ceil(requiredFinal - 1e-9);
 
-  const achievable = roundedRequired <= 100 && roundedRequired >= 0;
+  const achievable = roundedRequired <= 100;
 
   let message: string;
-  if (achievable) {
-    message = `Need ${roundedRequired}% on final exam to achieve ${targetGrade}`;
-  } else if (roundedRequired > 100) {
+  if (roundedRequired > 100) {
     message = `Cannot achieve ${targetGrade} - would need ${roundedRequired}% on final (impossible)`;
-  } else {
+  } else if (roundedRequired < 0) {
     message = `Already guaranteed better than ${targetGrade}`;
+  } else {
+    message = `Need ${roundedRequired}% on final exam to achieve ${targetGrade}`;
   }
 
   return {
-    requiredFinal: roundedRequired,
+    requiredFinal: Math.max(0, roundedRequired),
     achievable,
     message,
   };
