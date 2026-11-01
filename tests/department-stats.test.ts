@@ -207,3 +207,20 @@ Deno.test("compareDepartments returns blanks with no departments", () => {
     needsAttention: "",
   });
 });
+
+Deno.test("compareDepartments leaves courses nobody has finished out of the pass rate", () => {
+  const { comparison } = compareDepartments(
+    dataWithStudents(
+      makeStudent({ enrollments: [passedCourse("CENG201")] }),
+      makeStudent({ enrollments: [failedCourse("CENG201")] }),
+    ),
+  );
+
+  // CENG201 is the only CENG course with results, and SENG has none
+  assertEquals(comparison.map((dept) => dept.avgPassRate), [50, 0]);
+});
+
+Deno.test("compareDepartments averages sample pass rates over courses with results", () => {
+  // All 6 SENG courses with results have a 100% pass rate
+  assertEquals(compareDepartments(sampleData).comparison[1].avgPassRate, 100);
+});

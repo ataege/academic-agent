@@ -218,10 +218,14 @@ export function compareDepartments(data: AcademicData): {
 } {
   const comparison = data.departments.map((dept) => {
     const stats = getDepartmentStatistics(dept.id, data);
+    // A course nobody has finished has no pass rate, so it can't lower the average
+    const coursesWithResults = stats.courseStats.filter(
+      (cs) => cs.totalEnrollments > 0
+    );
     const avgPassRate =
-      stats.courseStats.length > 0
-        ? stats.courseStats.reduce((sum, cs) => sum + cs.passRate, 0) /
-          stats.courseStats.length
+      coursesWithResults.length > 0
+        ? coursesWithResults.reduce((sum, cs) => sum + cs.passRate, 0) /
+          coursesWithResults.length
         : 0;
 
     return {
