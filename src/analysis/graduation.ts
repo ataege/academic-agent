@@ -34,7 +34,8 @@ export function calculateGraduationProgress(
   );
 
   // Calculate elective credits
-  const electiveCourseIds = passedCourseIds.filter(
+  // De-duplicated because passing a course twice earns its credits once
+  const electiveCourseIds = [...new Set(passedCourseIds)].filter(
     (id) => !requirements.required_courses.includes(id)
   );
   const electiveCredits = electiveCourseIds.reduce((sum, courseId) => {

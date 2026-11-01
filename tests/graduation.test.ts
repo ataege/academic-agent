@@ -260,3 +260,18 @@ Deno.test("getGraduationTimeline flags many required courses late in the degree"
   assertEquals(semestersRemaining, 1);
   assertEquals(riskFactors, ["Many required courses remaining"]);
 });
+
+Deno.test("calculateGraduationProgress counts an elective passed twice only once", () => {
+  const progress = calculateGraduationProgress(
+    makeStudent({
+      enrollments: [
+        passedCourse("CENG350", "DD"),
+        passedCourse("CENG350", "AA"),
+      ],
+    }),
+    sampleData,
+  );
+
+  assertEquals(progress.electiveCredits, 3);
+  assertEquals(progress.electiveCreditsNeeded, 15);
+});
