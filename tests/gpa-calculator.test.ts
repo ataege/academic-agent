@@ -206,3 +206,35 @@ Deno.test("calculateRequiredScores ignores completed and ungraded courses", () =
     [],
   );
 });
+
+Deno.test("getLetterGrade keeps fractional scores in the bracket below", () => {
+  const expectedGrades: [number, string][] = [
+    [89.4, "BA"],
+    [89.99, "BA"],
+    [84.5, "BB"],
+    [79.5, "CB"],
+    [74.5, "CC"],
+    [69.5, "DC"],
+    [64.5, "DD"],
+    [59.5, "FD"],
+    [49.5, "FF"],
+  ];
+
+  for (const [score, grade] of expectedGrades) {
+    assertEquals(getLetterGrade(score, gradingScale), grade, `score ${score}`);
+  }
+});
+
+Deno.test("getLetterGrade agrees with every stored sample grade", () => {
+  const completed = sampleData.students
+    .flatMap((student) => student.enrollments)
+    .filter((enrollment) => enrollment.status !== "in_progress");
+
+  for (const enrollment of completed) {
+    assertEquals(
+      getLetterGrade(enrollment.weighted_average!, gradingScale),
+      enrollment.letter_grade,
+      `average ${enrollment.weighted_average}`,
+    );
+  }
+});

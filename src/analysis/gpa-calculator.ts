@@ -30,8 +30,10 @@ export function getLetterGrade(
     ([, a], [, b]) => b.min - a.min
   );
 
+  // Brackets are whole numbers with gaps between them, so match on min alone:
+  // 89.4 is a BA even though BA's max is 89
   for (const [grade, range] of sortedGrades) {
-    if (score >= range.min && score <= range.max) {
+    if (score >= range.min) {
       return grade;
     }
   }
