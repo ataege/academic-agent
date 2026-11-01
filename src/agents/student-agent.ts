@@ -1,10 +1,11 @@
-import { createAgent, type AgentConfig } from "./base-agent.ts";
+import { type AgentConfig, createAgent } from "./base-agent.ts";
 import { createStudentTools } from "../tools/student-tools.ts";
 import type { AcademicData } from "../types/academic.ts";
 import { findStudent } from "../data/loader.ts";
 
 // System prompt for student-focused academic advisor
-const STUDENT_SYSTEM_PROMPT = `You are an Academic Advisor AI assistant helping a student at Tech University.
+const STUDENT_SYSTEM_PROMPT =
+  `You are an Academic Advisor AI assistant helping a student at Tech University.
 
 Your role is to provide personalized academic guidance by:
 1. Assessing the student's current academic standing and performance
@@ -41,7 +42,7 @@ Remember: You are speaking directly to the student about THEIR academic journey.
 export function createStudentAgent(
   data: AcademicData,
   studentId: string,
-  config: AgentConfig = {}
+  config: AgentConfig = {},
 ) {
   // Validate student exists
   const student = findStudent(data, studentId);
@@ -64,7 +65,7 @@ export function getStudentInfo(data: AcademicData, studentId: string) {
   if (!student) return null;
 
   const department = data.departments.find(
-    (d) => d.id === student.department_id
+    (d) => d.id === student.department_id,
   );
 
   return {

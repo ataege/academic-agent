@@ -1,17 +1,17 @@
 import type {
-  Student,
   AcademicData,
-  GraduationProgress,
   Course,
+  GraduationProgress,
+  Student,
 } from "../types/academic.ts";
-import { getDepartment, findCourse } from "../data/loader.ts";
+import { findCourse, getDepartment } from "../data/loader.ts";
 
 /**
  * Calculate graduation progress for a student
  */
 export function calculateGraduationProgress(
   student: Student,
-  data: AcademicData
+  data: AcademicData,
 ): GraduationProgress {
   const department = getDepartment(data, student.department_id);
   if (!department) {
@@ -30,13 +30,13 @@ export function calculateGraduationProgress(
     passedCourseIds.includes(courseId)
   );
   const remainingRequired = requirements.required_courses.filter(
-    (courseId) => !passedCourseIds.includes(courseId)
+    (courseId) => !passedCourseIds.includes(courseId),
   );
 
   // Calculate elective credits
   // De-duplicated because passing a course twice earns its credits once
   const electiveCourseIds = [...new Set(passedCourseIds)].filter(
-    (id) => !requirements.required_courses.includes(id)
+    (id) => !requirements.required_courses.includes(id),
   );
   const electiveCredits = electiveCourseIds.reduce((sum, courseId) => {
     const course = findCourse(data, courseId);
@@ -45,23 +45,25 @@ export function calculateGraduationProgress(
 
   const electiveCreditsNeeded = Math.max(
     0,
-    requirements.min_elective_credits - electiveCredits
+    requirements.min_elective_credits - electiveCredits,
   );
 
   // Calculate credits remaining
   const creditsRemaining = Math.max(
     0,
-    requirements.min_credits - student.completed_credits
+    requirements.min_credits - student.completed_credits,
   );
 
   // Estimate semesters remaining (assuming ~18 credits/semester)
   const avgCreditsPerSemester = 18;
-  const estimatedSemesters = Math.ceil(creditsRemaining / avgCreditsPerSemester);
+  const estimatedSemesters = Math.ceil(
+    creditsRemaining / avgCreditsPerSemester,
+  );
 
   // Determine if on track (within 10% of expected progress).
   // The current semester isn't finished, so only earlier ones count.
-  const expectedProgress =
-    ((student.current_semester - 1) / 8) * requirements.min_credits;
+  const expectedProgress = ((student.current_semester - 1) / 8) *
+    requirements.min_credits;
   const isOnTrack = student.completed_credits >= expectedProgress * 0.9;
 
   // Check GPA status
@@ -90,7 +92,7 @@ export function calculateGraduationProgress(
 export function getRecommendedNextCourses(
   student: Student,
   data: AcademicData,
-  maxCourses: number = 4
+  maxCourses: number = 4,
 ): Course[] {
   const progress = calculateGraduationProgress(student, data);
 
@@ -98,13 +100,13 @@ export function getRecommendedNextCourses(
   const passedCourseIds = new Set(
     student.enrollments
       .filter((e) => e.status === "passed")
-      .map((e) => e.course_id)
+      .map((e) => e.course_id),
   );
 
   const currentlyEnrolledIds = new Set(
     student.enrollments
       .filter((e) => e.status === "in_progress")
-      .map((e) => e.course_id)
+      .map((e) => e.course_id),
   );
 
   const availableCourses = data.courses.filter((course) => {
@@ -151,7 +153,7 @@ export function getRecommendedNextCourses(
  */
 export function checkGraduationEligibility(
   student: Student,
-  data: AcademicData
+  data: AcademicData,
 ): {
   eligible: boolean;
   missingRequirements: string[];
@@ -162,7 +164,7 @@ export function checkGraduationEligibility(
   // Check credits
   if (progress.creditsRemaining > 0) {
     missingRequirements.push(
-      `Need ${progress.creditsRemaining} more credits (have ${progress.completedCredits}/${progress.requiredCredits})`
+      `Need ${progress.creditsRemaining} more credits (have ${progress.completedCredits}/${progress.requiredCredits})`,
     );
   }
 
@@ -177,7 +179,7 @@ export function checkGraduationEligibility(
   // Check elective credits
   if (progress.electiveCreditsNeeded > 0) {
     missingRequirements.push(
-      `Need ${progress.electiveCreditsNeeded} more elective credits`
+      `Need ${progress.electiveCreditsNeeded} more elective credits`,
     );
   }
 
@@ -185,7 +187,9 @@ export function checkGraduationEligibility(
   if (progress.gpaStatus === "below") {
     const department = getDepartment(data, student.department_id);
     missingRequirements.push(
-      `GPA ${student.gpa.toFixed(2)} is below minimum ${department?.graduation_requirements.min_gpa}`
+      `GPA ${
+        student.gpa.toFixed(2)
+      } is below minimum ${department?.graduation_requirements.min_gpa}`,
     );
   }
 
@@ -200,7 +204,7 @@ export function checkGraduationEligibility(
  */
 export function getGraduationTimeline(
   student: Student,
-  data: AcademicData
+  data: AcademicData,
 ): {
   estimatedGraduation: string;
   semestersRemaining: number;

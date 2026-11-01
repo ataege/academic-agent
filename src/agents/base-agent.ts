@@ -1,7 +1,7 @@
 import { ChatAnthropic } from "@langchain/anthropic";
 import { ChatOpenAI } from "@langchain/openai";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
-import { HumanMessage, AIMessage } from "@langchain/core/messages";
+import { AIMessage, HumanMessage } from "@langchain/core/messages";
 import type { StructuredToolInterface } from "@langchain/core/tools";
 import type { BaseChatModel } from "@langchain/core/language_models/chat_models";
 
@@ -36,10 +36,11 @@ const DEFAULT_TEMPERATURE = 0.1;
  * Blank environment values count as unset, since .env files often leave them empty
  */
 export function getLLMSelection(config: AgentConfig = {}) {
-  const provider = config.provider ?? (Deno.env.get("LLM_PROVIDER") || "openai");
+  const provider = config.provider ??
+    (Deno.env.get("LLM_PROVIDER") || "openai");
   if (!Object.hasOwn(PROVIDER_DEFAULTS, provider)) {
     throw new Error(
-      `Unknown LLM_PROVIDER "${provider}": use "openai" or "anthropic"`
+      `Unknown LLM_PROVIDER "${provider}": use "openai" or "anthropic"`,
     );
   }
 
@@ -89,7 +90,7 @@ export function createLLM(config: AgentConfig = {}): BaseChatModel {
 export function createAgent(
   tools: StructuredToolInterface[],
   systemPrompt: string,
-  config: AgentConfig = {}
+  config: AgentConfig = {},
 ) {
   const llm = createLLM(config);
 
@@ -112,7 +113,7 @@ export function createAgent(
 export async function executeQuery(
   // deno-lint-ignore no-explicit-any
   agent: any,
-  query: string
+  query: string,
 ): Promise<string> {
   try {
     const response = await agent.invoke({
@@ -140,7 +141,7 @@ export async function executeQueryWithHistory(
   // deno-lint-ignore no-explicit-any
   agent: any,
   query: string,
-  history: { role: "user" | "assistant"; content: string }[]
+  history: { role: "user" | "assistant"; content: string }[],
 ): Promise<string> {
   // Convert history to LangChain message format
   const messages = history.map((msg) =>
@@ -173,7 +174,7 @@ export async function executeQueryWithHistory(
 export async function* streamQuery(
   // deno-lint-ignore no-explicit-any
   agent: any,
-  query: string
+  query: string,
 ): AsyncGenerator<string, void, unknown> {
   const stream = await agent.stream({
     messages: [new HumanMessage(query)],

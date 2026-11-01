@@ -1,8 +1,15 @@
 import { HumanMessage } from "@langchain/core/messages";
 import { createLLM, getLLMSelection } from "../agents/base-agent.ts";
 import type { AcademicData } from "../types/academic.ts";
-import { getAtRiskStudents, summarizeRiskStatus } from "../analysis/risk-assessment.ts";
-import { getDepartmentStatistics, getInstitutionOverview, getProblemCourses } from "../analysis/department-stats.ts";
+import {
+  getAtRiskStudents,
+  summarizeRiskStatus,
+} from "../analysis/risk-assessment.ts";
+import {
+  getDepartmentStatistics,
+  getInstitutionOverview,
+  getProblemCourses,
+} from "../analysis/department-stats.ts";
 import { getReportPrompt } from "./report-prompts.ts";
 
 // Report types supported
@@ -67,7 +74,8 @@ function prepareAtRiskData(data: AcademicData) {
       criticalCount: summary.critical,
       warningCount: summary.warning,
       normalCount: summary.normal,
-      atRiskPercentage: ((summary.critical + summary.warning) / summary.total * 100).toFixed(1),
+      atRiskPercentage:
+        ((summary.critical + summary.warning) / summary.total * 100).toFixed(1),
     },
     students: enrichedStudents,
   };
@@ -98,7 +106,9 @@ function prepareDepartmentData(data: AcademicData) {
       totalStudents: dept.totalStudents,
       averageGPA: dept.averageGPA.toFixed(2),
       atRiskCount: dept.atRiskCount,
-      atRiskPercentage: ((dept.atRiskCount / dept.totalStudents) * 100).toFixed(1),
+      atRiskPercentage: ((dept.atRiskCount / dept.totalStudents) * 100).toFixed(
+        1,
+      ),
       probationCount: dept.probationCount,
       courses: dept.courseStats.map((cs) => ({
         id: cs.courseId,
@@ -117,8 +127,12 @@ function prepareDepartmentData(data: AcademicData) {
  */
 function prepareInterventionData(data: AcademicData) {
   const atRiskStudents = getAtRiskStudents(data);
-  const criticalStudents = atRiskStudents.filter((s) => s.riskLevel === "critical");
-  const warningStudents = atRiskStudents.filter((s) => s.riskLevel === "warning");
+  const criticalStudents = atRiskStudents.filter((s) =>
+    s.riskLevel === "critical"
+  );
+  const warningStudents = atRiskStudents.filter((s) =>
+    s.riskLevel === "warning"
+  );
   const problemCourses = getProblemCourses(data, 15);
   const summary = summarizeRiskStatus(data);
 
@@ -184,7 +198,7 @@ function prepareDataContext(reportType: ReportType, data: AcademicData) {
  */
 export async function generateAIReport(
   reportType: ReportType,
-  data: AcademicData
+  data: AcademicData,
 ): Promise<string> {
   const llm = createLLM({ temperature: 0.3 }); // Slightly creative for natural prose
 

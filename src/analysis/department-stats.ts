@@ -1,7 +1,7 @@
 import type {
   AcademicData,
-  DepartmentStats,
   CourseStats,
+  DepartmentStats,
 } from "../types/academic.ts";
 
 /**
@@ -9,7 +9,7 @@ import type {
  */
 export function getDepartmentStatistics(
   departmentId: string,
-  data: AcademicData
+  data: AcademicData,
 ): DepartmentStats {
   const department = data.departments.find((d) => d.id === departmentId);
   if (!department) {
@@ -18,26 +18,25 @@ export function getDepartmentStatistics(
 
   // Get students in department
   const deptStudents = data.students.filter(
-    (s) => s.department_id === departmentId
+    (s) => s.department_id === departmentId,
   );
 
   // Calculate average GPA
-  const averageGPA =
-    deptStudents.length > 0
-      ? deptStudents.reduce((sum, s) => sum + s.gpa, 0) / deptStudents.length
-      : 0;
+  const averageGPA = deptStudents.length > 0
+    ? deptStudents.reduce((sum, s) => sum + s.gpa, 0) / deptStudents.length
+    : 0;
 
   // Count at-risk and probation students
   const atRiskCount = deptStudents.filter(
-    (s) => s.gpa < 2.0 || s.status === "warning"
+    (s) => s.gpa < 2.0 || s.status === "warning",
   ).length;
   const probationCount = deptStudents.filter(
-    (s) => s.status === "probation"
+    (s) => s.status === "probation",
   ).length;
 
   // Calculate course statistics
   const deptCourses = data.courses.filter(
-    (c) => c.department_id === departmentId
+    (c) => c.department_id === departmentId,
   );
   const courseStats: CourseStats[] = deptCourses.map((course) =>
     calculateCourseStats(course.id, data)
@@ -59,7 +58,7 @@ export function getDepartmentStatistics(
  */
 export function calculateCourseStats(
   courseId: string,
-  data: AcademicData
+  data: AcademicData,
 ): CourseStats {
   const course = data.courses.find((c) => c.id === courseId);
   if (!course) {
@@ -80,22 +79,23 @@ export function calculateCourseStats(
   const failedCount = completed.filter((e) => e.status === "failed").length;
   const totalCompleted = passedCount + failedCount;
 
-  const passRate =
-    totalCompleted > 0 ? (passedCount / totalCompleted) * 100 : 0;
-  const failRate =
-    totalCompleted > 0 ? (failedCount / totalCompleted) * 100 : 0;
+  const passRate = totalCompleted > 0
+    ? (passedCount / totalCompleted) * 100
+    : 0;
+  const failRate = totalCompleted > 0
+    ? (failedCount / totalCompleted) * 100
+    : 0;
 
   // Calculate average score
   const scoresWithValues = completed.filter((e) => e.weighted_average !== null);
-  const averageScore =
-    scoresWithValues.length > 0
-      ? scoresWithValues.reduce((sum, e) => sum + (e.weighted_average ?? 0), 0) /
-        scoresWithValues.length
-      : 0;
+  const averageScore = scoresWithValues.length > 0
+    ? scoresWithValues.reduce((sum, e) => sum + (e.weighted_average ?? 0), 0) /
+      scoresWithValues.length
+    : 0;
 
   // Count currently at-risk students
   const atRiskCount = current.filter(
-    (e) => e.midterm_score !== null && e.midterm_score < 60
+    (e) => e.midterm_score !== null && e.midterm_score < 60,
   ).length;
 
   return {
@@ -119,13 +119,17 @@ export function getInstitutionOverview(data: AcademicData): {
   totalStudents: number;
   averageGPA: number;
   statusDistribution: { active: number; warning: number; probation: number };
-  departmentSummary: { id: string; name: string; studentCount: number; avgGPA: number }[];
+  departmentSummary: {
+    id: string;
+    name: string;
+    studentCount: number;
+    avgGPA: number;
+  }[];
 } {
   const totalStudents = data.students.length;
-  const avgGPA =
-    totalStudents > 0
-      ? data.students.reduce((sum, s) => sum + s.gpa, 0) / totalStudents
-      : 0;
+  const avgGPA = totalStudents > 0
+    ? data.students.reduce((sum, s) => sum + s.gpa, 0) / totalStudents
+    : 0;
 
   const statusDistribution = {
     active: data.students.filter((s) => s.status === "active").length,
@@ -135,12 +139,11 @@ export function getInstitutionOverview(data: AcademicData): {
 
   const departmentSummary = data.departments.map((dept) => {
     const deptStudents = data.students.filter(
-      (s) => s.department_id === dept.id
+      (s) => s.department_id === dept.id,
     );
-    const deptAvgGPA =
-      deptStudents.length > 0
-        ? deptStudents.reduce((sum, s) => sum + s.gpa, 0) / deptStudents.length
-        : 0;
+    const deptAvgGPA = deptStudents.length > 0
+      ? deptStudents.reduce((sum, s) => sum + s.gpa, 0) / deptStudents.length
+      : 0;
     return {
       id: dept.id,
       name: dept.name,
@@ -167,7 +170,7 @@ export function getInstitutionOverview(data: AcademicData): {
  */
 export function getProblemCourses(
   data: AcademicData,
-  failRateThreshold: number = 20
+  failRateThreshold: number = 20,
 ): CourseStats[] {
   const allCourseStats = data.courses.map((course) =>
     calculateCourseStats(course.id, data)
@@ -183,11 +186,11 @@ export function getProblemCourses(
  */
 export function getCourseGradeDistribution(
   courseId: string,
-  data: AcademicData
+  data: AcademicData,
 ): Record<string, number> {
   const enrollments = data.students.flatMap((s) =>
     s.enrollments.filter(
-      (e) => e.course_id === courseId && e.status !== "in_progress"
+      (e) => e.course_id === courseId && e.status !== "in_progress",
     )
   );
 
@@ -220,22 +223,20 @@ export function compareDepartments(data: AcademicData): {
     const stats = getDepartmentStatistics(dept.id, data);
     // A course nobody has finished has no pass rate, so it can't lower the average
     const coursesWithResults = stats.courseStats.filter(
-      (cs) => cs.totalEnrollments > 0
+      (cs) => cs.totalEnrollments > 0,
     );
-    const avgPassRate =
-      coursesWithResults.length > 0
-        ? coursesWithResults.reduce((sum, cs) => sum + cs.passRate, 0) /
-          coursesWithResults.length
-        : 0;
+    const avgPassRate = coursesWithResults.length > 0
+      ? coursesWithResults.reduce((sum, cs) => sum + cs.passRate, 0) /
+        coursesWithResults.length
+      : 0;
 
     return {
       departmentId: dept.id,
       departmentName: dept.name,
       avgGPA: stats.averageGPA,
-      atRiskPercentage:
-        stats.totalStudents > 0
-          ? (stats.atRiskCount / stats.totalStudents) * 100
-          : 0,
+      atRiskPercentage: stats.totalStudents > 0
+        ? (stats.atRiskCount / stats.totalStudents) * 100
+        : 0,
       avgPassRate,
     };
   });

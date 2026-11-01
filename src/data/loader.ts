@@ -1,4 +1,10 @@
-import type { AcademicData, Student, Course, Department, Semester } from "../types/academic.ts";
+import type {
+  AcademicData,
+  Course,
+  Department,
+  Semester,
+  Student,
+} from "../types/academic.ts";
 
 // Default path to academic data file
 const DEFAULT_DATA_PATH = "./data/academic_data.json";
@@ -12,7 +18,7 @@ let cachedPath: string | null = null;
  * Uses caching to avoid repeated file reads
  */
 export async function loadAcademicData(
-  path: string = DEFAULT_DATA_PATH
+  path: string = DEFAULT_DATA_PATH,
 ): Promise<AcademicData> {
   // Return cached data if available
   if (cachedData && cachedPath === path) {
@@ -25,7 +31,9 @@ export async function loadAcademicData(
 
     // Validate essential data exists
     if (!data.students || !data.courses || !data.departments) {
-      throw new Error("Invalid academic data structure: missing required fields");
+      throw new Error(
+        "Invalid academic data structure: missing required fields",
+      );
     }
 
     // Cache for future use
@@ -53,7 +61,7 @@ export function clearDataCache(): void {
  */
 export function findStudent(
   data: AcademicData,
-  identifier: string
+  identifier: string,
 ): Student | undefined {
   // First try exact ID match
   const byId = data.students.find((s) => s.id === identifier);
@@ -73,13 +81,13 @@ export function findStudent(
  */
 export function findCourse(
   data: AcademicData,
-  identifier: string
+  identifier: string,
 ): Course | undefined {
   return data.courses.find(
     (c) =>
       c.id === identifier ||
       c.code === identifier ||
-      c.code.replace(" ", "") === identifier // Handle "CENG101" vs "CENG 101"
+      c.code.replace(" ", "") === identifier, // Handle "CENG101" vs "CENG 101"
   );
 }
 
@@ -88,7 +96,7 @@ export function findCourse(
  */
 export function getDepartment(
   data: AcademicData,
-  departmentId: string
+  departmentId: string,
 ): Department | undefined {
   return data.departments.find((d) => d.id === departmentId);
 }
@@ -105,7 +113,7 @@ export function getCurrentSemester(data: AcademicData): Semester | undefined {
  */
 export function getStudentsByDepartment(
   data: AcademicData,
-  departmentId: string
+  departmentId: string,
 ): Student[] {
   return data.students.filter((s) => s.department_id === departmentId);
 }
@@ -115,7 +123,7 @@ export function getStudentsByDepartment(
  */
 export function getCoursesByDepartment(
   data: AcademicData,
-  departmentId: string
+  departmentId: string,
 ): Course[] {
   return data.courses.filter((c) => c.department_id === departmentId);
 }
@@ -139,7 +147,7 @@ export function getCompletedEnrollments(student: Student) {
  */
 export function hasPassedCourse(student: Student, courseId: string): boolean {
   return student.enrollments.some(
-    (e) => e.course_id === courseId && e.status === "passed"
+    (e) => e.course_id === courseId && e.status === "passed",
   );
 }
 
@@ -148,7 +156,7 @@ export function hasPassedCourse(student: Student, courseId: string): boolean {
  */
 export function getAvailableCourses(
   data: AcademicData,
-  student: Student
+  student: Student,
 ): Course[] {
   const department = getDepartment(data, student.department_id);
   if (!department) return [];
@@ -157,7 +165,7 @@ export function getAvailableCourses(
   const relevantCourses = data.courses.filter(
     (c) =>
       c.department_id === student.department_id ||
-      c.id.startsWith("MATH")
+      c.id.startsWith("MATH"),
   );
 
   return relevantCourses.filter((course) => {
@@ -166,7 +174,7 @@ export function getAvailableCourses(
 
     // Skip if currently enrolled
     const currentlyEnrolled = student.enrollments.some(
-      (e) => e.course_id === course.id && e.status === "in_progress"
+      (e) => e.course_id === course.id && e.status === "in_progress",
     );
     if (currentlyEnrolled) return false;
 

@@ -1,8 +1,8 @@
 import type {
+  Course,
   Enrollment,
   GradeScaleEntry,
   GradeWeights,
-  Course,
 } from "../types/academic.ts";
 
 /**
@@ -12,7 +12,7 @@ import type {
 export function calculateWeightedAverage(
   midterm: number,
   final: number,
-  weights: GradeWeights
+  weights: GradeWeights,
 ): number {
   return midterm * weights.midterm + final * weights.final;
 }
@@ -22,11 +22,11 @@ export function calculateWeightedAverage(
  */
 export function getLetterGrade(
   score: number,
-  gradingScale: Record<string, GradeScaleEntry>
+  gradingScale: Record<string, GradeScaleEntry>,
 ): string {
   // Sort grades by min score descending to find correct bracket
   const sortedGrades = Object.entries(gradingScale).sort(
-    ([, a], [, b]) => b.min - a.min
+    ([, a], [, b]) => b.min - a.min,
   );
 
   // Brackets are whole numbers with gaps between them, so match on min alone:
@@ -44,7 +44,7 @@ export function getLetterGrade(
  */
 export function getGPAForGrade(
   letterGrade: string,
-  gradingScale: Record<string, GradeScaleEntry>
+  gradingScale: Record<string, GradeScaleEntry>,
 ): number {
   return gradingScale[letterGrade]?.gpa ?? 0.0;
 }
@@ -55,7 +55,7 @@ export function getGPAForGrade(
 export function calculateGPA(
   enrollments: Enrollment[],
   courses: Course[],
-  gradingScale: Record<string, GradeScaleEntry>
+  gradingScale: Record<string, GradeScaleEntry>,
 ): number {
   // Count each course's latest completed attempt, so a failure stays at its grade
   // until a retake replaces it. Enrollments are stored in chronological order.
@@ -91,7 +91,7 @@ export function predictFinalGrade(
   midtermScore: number,
   targetGrade: string,
   weights: GradeWeights,
-  gradingScale: Record<string, GradeScaleEntry>
+  gradingScale: Record<string, GradeScaleEntry>,
 ): { requiredFinal: number; achievable: boolean; message: string } {
   const targetMin = gradingScale[targetGrade]?.min;
   if (targetMin === undefined) {
@@ -104,8 +104,8 @@ export function predictFinalGrade(
 
   // Solve: targetMin = (midterm * weightMid) + (final * weightFinal)
   // final = (targetMin - midterm * weightMid) / weightFinal
-  const requiredFinal =
-    (targetMin - midtermScore * weights.midterm) / weights.final;
+  const requiredFinal = (targetMin - midtermScore * weights.midterm) /
+    weights.final;
   // Tolerance stops float noise (82.00000000000001) asking for an extra point
   const roundedRequired = Math.ceil(requiredFinal - 1e-9);
 
@@ -113,11 +113,13 @@ export function predictFinalGrade(
 
   let message: string;
   if (roundedRequired > 100) {
-    message = `Cannot achieve ${targetGrade} - would need ${roundedRequired}% on final (impossible)`;
+    message =
+      `Cannot achieve ${targetGrade} - would need ${roundedRequired}% on final (impossible)`;
   } else if (roundedRequired < 0) {
     message = `Already guaranteed better than ${targetGrade}`;
   } else {
-    message = `Need ${roundedRequired}% on final exam to achieve ${targetGrade}`;
+    message =
+      `Need ${roundedRequired}% on final exam to achieve ${targetGrade}`;
   }
 
   return {
@@ -135,10 +137,10 @@ export function projectSemesterGPA(
   enrollments: Enrollment[],
   courses: Course[],
   gradingScale: Record<string, GradeScaleEntry>,
-  weights: GradeWeights
+  weights: GradeWeights,
 ): number | null {
   const currentEnrollments = enrollments.filter(
-    (e) => e.status === "in_progress" && e.midterm_score !== null
+    (e) => e.status === "in_progress" && e.midterm_score !== null,
   );
 
   if (currentEnrollments.length === 0) return null;
@@ -155,7 +157,7 @@ export function projectSemesterGPA(
     const projectedAvg = calculateWeightedAverage(
       enrollment.midterm_score,
       projectedFinal,
-      weights
+      weights,
     );
 
     const projectedGrade = getLetterGrade(projectedAvg, gradingScale);
@@ -176,10 +178,10 @@ export function calculateRequiredScores(
   _courses: Course[],
   targetGPA: number,
   gradingScale: Record<string, GradeScaleEntry>,
-  weights: GradeWeights
+  weights: GradeWeights,
 ): { courseId: string; requiredFinal: number; achievable: boolean }[] {
   const currentEnrollments = enrollments.filter(
-    (e) => e.status === "in_progress" && e.midterm_score !== null
+    (e) => e.status === "in_progress" && e.midterm_score !== null,
   );
 
   // Find the minimum grade that would give us our target GPA
@@ -201,7 +203,7 @@ export function calculateRequiredScores(
       enrollment.midterm_score!,
       targetGrade,
       weights,
-      gradingScale
+      gradingScale,
     );
     return {
       courseId: enrollment.course_id,

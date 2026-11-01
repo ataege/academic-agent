@@ -1,9 +1,10 @@
-import { createAgent, type AgentConfig } from "./base-agent.ts";
+import { type AgentConfig, createAgent } from "./base-agent.ts";
 import { createDeanTools } from "../tools/dean-tools.ts";
 import type { AcademicData } from "../types/academic.ts";
 
 // System prompt for dean-level institutional analysis
-const DEAN_SYSTEM_PROMPT = `You are an Academic Analytics AI assistant for university administrators at Tech University.
+const DEAN_SYSTEM_PROMPT =
+  `You are an Academic Analytics AI assistant for university administrators at Tech University.
 
 Your role is to provide data-driven insights for institutional decision-making by:
 1. Identifying students at risk of academic failure across the institution
@@ -46,7 +47,7 @@ Remember: You are advising university leadership. Be professional, data-driven, 
  */
 export function createDeanAgent(
   data: AcademicData,
-  config: AgentConfig = {}
+  config: AgentConfig = {},
 ) {
   // Create institution-wide analysis tools
   const tools = createDeanTools(data);

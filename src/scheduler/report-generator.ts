@@ -1,5 +1,9 @@
 import { loadAcademicData } from "../data/loader.ts";
-import { generateAIReport, generateReportHeader, type ReportType } from "./report-agent.ts";
+import {
+  generateAIReport,
+  generateReportHeader,
+  type ReportType,
+} from "./report-agent.ts";
 
 // Report output directory
 const REPORTS_DIR = "./reports";
@@ -22,7 +26,7 @@ async function generateReport(
   title: string,
   filename: string,
   data: Awaited<ReturnType<typeof loadAcademicData>>,
-  outputDir: string
+  outputDir: string,
 ): Promise<void> {
   console.log(`  Generating ${title} (AI-powered)...`);
 
@@ -41,16 +45,27 @@ async function generateReport(
   console.log(`  ✓ Saved: ${outputPath}`);
 }
 
-
 // Report configurations for AI generation
 const REPORT_CONFIGS: Array<{
   type: ReportType;
   title: string;
   filename: string;
 }> = [
-  { type: "at-risk", title: "At-Risk Students Report", filename: "at-risk-students.md" },
-  { type: "department", title: "Department Performance Report", filename: "department-summary.md" },
-  { type: "intervention", title: "Intervention Action Plan", filename: "intervention-plan.md" },
+  {
+    type: "at-risk",
+    title: "At-Risk Students Report",
+    filename: "at-risk-students.md",
+  },
+  {
+    type: "department",
+    title: "Department Performance Report",
+    filename: "department-summary.md",
+  },
+  {
+    type: "intervention",
+    title: "Intervention Action Plan",
+    filename: "intervention-plan.md",
+  },
 ];
 
 /**
@@ -58,14 +73,14 @@ const REPORT_CONFIGS: Array<{
  * This is the main entry point for scheduled report generation
  */
 export async function generateDailyReports(
-  dataPath?: string
+  dataPath?: string,
 ): Promise<{ outputDir: string; reports: string[] }> {
   console.log("\n📊 Starting AI-powered report generation...\n");
 
   // Load academic data
   const data = await loadAcademicData(dataPath);
   console.log(
-    `Loaded data: ${data.students.length} students, ${data.courses.length} courses\n`
+    `Loaded data: ${data.students.length} students, ${data.courses.length} courses\n`,
   );
 
   // Create date-stamped output directory
@@ -78,7 +93,13 @@ export async function generateDailyReports(
 
   for (const config of REPORT_CONFIGS) {
     try {
-      await generateReport(config.type, config.title, config.filename, data, outputDir);
+      await generateReport(
+        config.type,
+        config.title,
+        config.filename,
+        data,
+        outputDir,
+      );
       reports.push(config.filename);
     } catch (error) {
       console.error(`  ✗ Failed to generate ${config.title}:`, error);

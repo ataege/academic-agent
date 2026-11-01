@@ -1,15 +1,18 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import type { AcademicData } from "../types/academic.ts";
-import { findStudent, findCourse } from "../data/loader.ts";
-import { getAtRiskStudents, summarizeRiskStatus } from "../analysis/risk-assessment.ts";
+import { findCourse, findStudent } from "../data/loader.ts";
 import {
+  getAtRiskStudents,
+  summarizeRiskStatus,
+} from "../analysis/risk-assessment.ts";
+import {
+  calculateCourseStats,
+  compareDepartments,
+  getCourseGradeDistribution,
   getDepartmentStatistics,
   getInstitutionOverview,
-  calculateCourseStats,
   getProblemCourses,
-  getCourseGradeDistribution,
-  compareDepartments,
 } from "../analysis/department-stats.ts";
 
 /**
@@ -33,7 +36,7 @@ export function createDeanTools(data: AcademicData) {
         },
         students: atRiskStudents.map((assessment) => {
           const student = data.students.find(
-            (s) => s.id === assessment.studentId
+            (s) => s.id === assessment.studentId,
           );
           return {
             studentId: assessment.studentId,
@@ -51,7 +54,7 @@ export function createDeanTools(data: AcademicData) {
       name: "get_all_at_risk_students",
       description:
         "Get a comprehensive list of all at-risk students across the institution, including their risk levels, factors, and recommended interventions. Use this for institution-wide risk assessment.",
-    }
+    },
   );
 
   // Tool 2: Get department statistics
@@ -66,10 +69,9 @@ export function createDeanTools(data: AcademicData) {
         averageGPA: stats.averageGPA.toFixed(2),
         atRiskStudents: stats.atRiskCount,
         studentsOnProbation: stats.probationCount,
-        atRiskPercentage:
-          stats.totalStudents > 0
-            ? ((stats.atRiskCount / stats.totalStudents) * 100).toFixed(1)
-            : 0,
+        atRiskPercentage: stats.totalStudents > 0
+          ? ((stats.atRiskCount / stats.totalStudents) * 100).toFixed(1)
+          : 0,
         coursePerformance: stats.courseStats.map((cs) => ({
           courseId: cs.courseId,
           courseName: cs.courseName,
@@ -87,9 +89,11 @@ export function createDeanTools(data: AcademicData) {
       schema: z.object({
         departmentId: z
           .enum(["CENG", "SENG"])
-          .describe("Department ID: CENG (Computer Engineering) or SENG (Software Engineering)"),
+          .describe(
+            "Department ID: CENG (Computer Engineering) or SENG (Software Engineering)",
+          ),
       }),
-    }
+    },
   );
 
   // Tool 3: Get institution overview
@@ -119,7 +123,7 @@ export function createDeanTools(data: AcademicData) {
       name: "get_institution_overview",
       description:
         "Get a high-level overview of the entire institution including total students, average GPA, status distribution, and department comparisons. Use this for executive summaries.",
-    }
+    },
   );
 
   // Tool 4: Get course performance report
@@ -136,16 +140,14 @@ export function createDeanTools(data: AcademicData) {
       // Get current enrollments with details
       const currentEnrollments = data.students.flatMap((s) =>
         s.enrollments.filter(
-          (e) => e.course_id === course.id && e.status === "in_progress"
+          (e) => e.course_id === course.id && e.status === "in_progress",
         )
       );
 
       const atRiskStudents = currentEnrollments
         .filter((e) => e.midterm_score !== null && e.midterm_score < 60)
         .map((e) => {
-          const student = data.students.find((s) =>
-            s.enrollments.includes(e)
-          );
+          const student = data.students.find((s) => s.enrollments.includes(e));
           return {
             studentId: student?.id,
             studentName: student?.name,
@@ -181,9 +183,11 @@ export function createDeanTools(data: AcademicData) {
       schema: z.object({
         courseId: z
           .string()
-          .describe("Course ID or code (e.g., 'CENG101', 'MATH201', 'SENG202')"),
+          .describe(
+            "Course ID or code (e.g., 'CENG101', 'MATH201', 'SENG202')",
+          ),
       }),
-    }
+    },
   );
 
   // Tool 5: Get student details
@@ -195,7 +199,7 @@ export function createDeanTools(data: AcademicData) {
       }
 
       const department = data.departments.find(
-        (d) => d.id === student.department_id
+        (d) => d.id === student.department_id,
       );
 
       const currentCourses = student.enrollments
@@ -244,9 +248,11 @@ export function createDeanTools(data: AcademicData) {
       schema: z.object({
         studentId: z
           .string()
-          .describe("Student ID (e.g., 'STU001') or partial name (e.g., 'Emily')"),
+          .describe(
+            "Student ID (e.g., 'STU001') or partial name (e.g., 'Emily')",
+          ),
       }),
-    }
+    },
   );
 
   // Tool 6: Generate intervention recommendations
@@ -254,10 +260,10 @@ export function createDeanTools(data: AcademicData) {
     () => {
       const atRiskStudents = getAtRiskStudents(data);
       const criticalStudents = atRiskStudents.filter(
-        (s) => s.riskLevel === "critical"
+        (s) => s.riskLevel === "critical",
       );
       const warningStudents = atRiskStudents.filter(
-        (s) => s.riskLevel === "warning"
+        (s) => s.riskLevel === "warning",
       );
 
       // Find problem courses
@@ -266,7 +272,7 @@ export function createDeanTools(data: AcademicData) {
       // Build intervention plan
       const immediateInterventions = criticalStudents.map((assessment) => {
         const student = data.students.find(
-          (s) => s.id === assessment.studentId
+          (s) => s.id === assessment.studentId,
         );
         return {
           studentId: assessment.studentId,
@@ -282,29 +288,30 @@ export function createDeanTools(data: AcademicData) {
         courseId: cs.courseId,
         courseName: cs.courseName,
         failRate: cs.failRate.toFixed(1) + "%",
-        recommendation:
-          cs.failRate > 30
-            ? "Review course difficulty and teaching methods; consider additional support resources"
-            : "Monitor closely; provide study groups and tutoring",
+        recommendation: cs.failRate > 30
+          ? "Review course difficulty and teaching methods; consider additional support resources"
+          : "Monitor closely; provide study groups and tutoring",
       }));
 
       const institutionalRecommendations: string[] = [];
 
       if (criticalStudents.length > 0) {
         institutionalRecommendations.push(
-          `URGENT: ${criticalStudents.length} students require immediate academic intervention`
+          `URGENT: ${criticalStudents.length} students require immediate academic intervention`,
         );
       }
       if (problemCourses.length > 0) {
         institutionalRecommendations.push(
-          `Review curriculum for ${problemCourses[0].courseName} (${problemCourses[0].failRate.toFixed(1)}% fail rate)`
+          `Review curriculum for ${problemCourses[0].courseName} (${
+            problemCourses[0].failRate.toFixed(1)
+          }% fail rate)`,
         );
       }
       institutionalRecommendations.push(
-        "Implement early warning system for students with midterm scores below 60%"
+        "Implement early warning system for students with midterm scores below 60%",
       );
       institutionalRecommendations.push(
-        "Consider peer tutoring program for high-risk courses"
+        "Consider peer tutoring program for high-risk courses",
       );
 
       return JSON.stringify({
@@ -322,7 +329,9 @@ export function createDeanTools(data: AcademicData) {
             ? `Schedule mandatory advisor meetings for ${criticalStudents.length} critical students this week`
             : "No critical student interventions needed",
           problemCourses.length > 0
-            ? `Department heads to review ${problemCourses[0].courseName} teaching effectiveness`
+            ? `Department heads to review ${
+              problemCourses[0].courseName
+            } teaching effectiveness`
             : "Course performance within acceptable ranges",
           "Send early warning notices to all students with midterm < 60%",
         ],
@@ -332,7 +341,7 @@ export function createDeanTools(data: AcademicData) {
       name: "get_intervention_recommendations",
       description:
         "Generate comprehensive intervention recommendations including priority actions for critical students, problem courses needing curriculum review, and institutional improvement suggestions.",
-    }
+    },
   );
 
   return [
