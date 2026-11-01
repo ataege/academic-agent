@@ -8,6 +8,7 @@ import { ChatAnthropic } from "@langchain/anthropic";
 import { ChatOpenAI } from "@langchain/openai";
 import { createLLM, executeQuery } from "../src/agents/base-agent.ts";
 import { createStudentAgent } from "../src/agents/student-agent.ts";
+import { clearVectorStore } from "../src/rag/course-retriever.ts";
 import {
   generateAIReport,
   generateReportHeader,
@@ -214,6 +215,35 @@ Deno.test("a student agent runs its tool loop against the Anthropic API", async 
         assertStringIncludes(
           JSON.stringify(toolResultTurn.content),
           "Emily Johnson",
+        );
+      },
+    ));
+});
+
+Deno.test("a Claude agent still answers when course search has no OpenAI key", async () => {
+  clearVectorStore();
+
+  await withLLMEnv(ANTHROPIC_SETTINGS, () =>
+    withFakeAnthropicApi(
+      [
+        [{
+          type: "tool_use",
+          id: "toolu_1",
+          name: "search_courses_by_topic",
+          input: { query: "machine learning" },
+        }],
+        [{ type: "text", text: "Course search is unavailable." }],
+      ],
+      async (requests) => {
+        const agent = createStudentAgent(sampleData, "STU001");
+
+        const answer = await executeQuery(agent, "Any AI courses?");
+
+        assertEquals(answer, "Course search is unavailable.");
+        // The failure reached the model as a tool result instead of ending the run
+        assertStringIncludes(
+          JSON.stringify(requests[1].messages[2].content),
+          "Error",
         );
       },
     ));
