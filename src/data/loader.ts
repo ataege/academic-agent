@@ -59,6 +59,9 @@ export function findStudent(
   const byId = data.students.find((s) => s.id === identifier);
   if (byId) return byId;
 
+  // Every name contains "", so a blank search must not match the first student
+  if (!identifier.trim()) return undefined;
+
   // Then try partial name match (case-insensitive)
   return data.students.find((s) =>
     s.name.toLowerCase().includes(identifier.toLowerCase())

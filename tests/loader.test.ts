@@ -183,3 +183,8 @@ Deno.test("loadAcademicData doesn't serve one file's data for another path", asy
   assertEquals(otherData.students, []);
   clearDataCache();
 });
+
+Deno.test("findStudent doesn't match a blank search", () => {
+  assertEquals(findStudent(sampleData, ""), undefined);
+  assertEquals(findStudent(sampleData, "   "), undefined);
+});
