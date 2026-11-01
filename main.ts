@@ -85,7 +85,12 @@ async function prompt(message: string): Promise<string> {
   const buf = new Uint8Array(1024);
   await Deno.stdout.write(new TextEncoder().encode(`${colors.green}${message}${colors.reset}`));
   const n = await Deno.stdin.read(buf);
-  return new TextDecoder().decode(buf.subarray(0, n ?? 0)).trim();
+  // Closed input (Ctrl-D or the end of a pipe) would otherwise loop on empty answers forever
+  if (n === null) {
+    console.log();
+    Deno.exit(0);
+  }
+  return new TextDecoder().decode(buf.subarray(0, n)).trim();
 }
 
 /**
