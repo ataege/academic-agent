@@ -210,11 +210,12 @@ export function getGraduationTimeline(
   const progress = calculateGraduationProgress(student, data);
   const riskFactors: string[] = [];
 
-  // Calculate expected graduation semester
-  const currentYear = 2024; // From academic year
-  const semesterOffset = 8 - student.current_semester + progress.estimatedSemesters;
-  const estimatedGradYear = currentYear + Math.ceil(semesterOffset / 2);
-  const estimatedSeason = semesterOffset % 2 === 0 ? "Spring" : "Fall";
+  // Count forward from the current semester: 1 is Fall 2024, 2 is Spring 2025.
+  // shortcut: assumes the current semester is Fall 2024, read data.semesters if that changes
+  const currentYear = 2024;
+  const semestersToCount = Math.max(1, progress.estimatedSemesters);
+  const estimatedGradYear = currentYear + Math.floor(semestersToCount / 2);
+  const estimatedSeason = semestersToCount % 2 === 0 ? "Spring" : "Fall";
   const estimatedGraduation = `${estimatedSeason} ${estimatedGradYear}`;
 
   // Identify risk factors

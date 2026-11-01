@@ -302,3 +302,32 @@ Deno.test("calculateGraduationProgress keeps a first-semester student on track",
     true,
   );
 });
+
+Deno.test("getGraduationTimeline counts forward from the current semester", () => {
+  const expectedDates: [string, string, number][] = [
+    ["STU001", "Spring 2026", 4], // Semester 5 finishing on the normal schedule
+    ["STU004", "Spring 2025", 2], // Semester 7 finishing on the normal schedule
+    ["STU003", "Fall 2026", 5], // Semester 5, a semester behind
+    ["STU005", "Fall 2027", 7], // Semester 3, a semester behind
+  ];
+
+  for (const [studentId, graduation, semesters] of expectedDates) {
+    const timeline = getGraduationTimeline(
+      sampleStudent(studentId),
+      sampleData,
+    );
+    assertEquals(timeline.estimatedGraduation, graduation, studentId);
+    assertEquals(timeline.semestersRemaining, semesters, studentId);
+  }
+});
+
+Deno.test("getGraduationTimeline finishes this semester when little or nothing remains", () => {
+  const graduationWithCredits = (completedCredits: number) =>
+    getGraduationTimeline(
+      makeStudent({ completed_credits: completedCredits, current_semester: 8 }),
+      sampleData,
+    ).estimatedGraduation;
+
+  assertEquals(graduationWithCredits(130), "Fall 2024");
+  assertEquals(graduationWithCredits(140), "Fall 2024");
+});
