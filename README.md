@@ -253,3 +253,7 @@ CI runs `deno fmt --check`, `deno lint`, `deno check main.ts` and
 - Move to LangChain 1.x, where `@langchain/anthropic` handles Claude's sampling
   rules itself.
 - Run reports on a schedule, for example with `Deno.cron`.
+
+## License
+
+[MIT](LICENSE)
