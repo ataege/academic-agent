@@ -27,7 +27,7 @@ const ANSI = {
  * Render markdown text to ANSI-styled terminal output
  */
 export function renderMarkdown(markdown: string): string {
-  let result = markdown;
+  const result = markdown;
 
   // Process line by line for block elements
   const lines = result.split("\n");
@@ -44,31 +44,30 @@ export function renderMarkdown(markdown: string): string {
     } else if (line.startsWith("## ")) {
       line = `\n${ANSI.bold}${ANSI.green}■ ${line.slice(3)}${ANSI.reset}\n`;
     } else if (line.startsWith("# ")) {
-      line = `\n${ANSI.bold}${ANSI.cyan}╔═══ ${line.slice(2)} ═══╗${ANSI.reset}\n`;
-    }
-    // Horizontal rules
+      line = `\n${ANSI.bold}${ANSI.cyan}╔═══ ${
+        line.slice(2)
+      } ═══╗${ANSI.reset}\n`;
+    } // Horizontal rules
     else if (line.match(/^[-_*]{3,}$/)) {
       line = `${ANSI.dim}${"─".repeat(50)}${ANSI.reset}`;
-    }
-    // Unordered lists
+    } // Unordered lists
     else if (line.match(/^\s*[-*]\s/)) {
       const indent = line.match(/^(\s*)/)?.[1] || "";
       const content = line.replace(/^\s*[-*]\s/, "");
       line = `${indent}${ANSI.cyan}•${ANSI.reset} ${content}`;
-    }
-    // Numbered lists
+    } // Numbered lists
     else if (line.match(/^\s*\d+\.\s/)) {
       const match = line.match(/^(\s*)(\d+)\.\s(.*)$/);
       if (match) {
         const [, indent, num, content] = match;
         line = `${indent}${ANSI.yellow}${num}.${ANSI.reset} ${content}`;
       }
-    }
-    // Blockquotes
+    } // Blockquotes
     else if (line.startsWith("> ")) {
-      line = `${ANSI.dim}│${ANSI.reset} ${ANSI.italic}${line.slice(2)}${ANSI.reset}`;
-    }
-    // Code blocks (triple backticks)
+      line = `${ANSI.dim}│${ANSI.reset} ${ANSI.italic}${
+        line.slice(2)
+      }${ANSI.reset}`;
+    } // Code blocks (triple backticks)
     else if (line.startsWith("```")) {
       line = `${ANSI.dim}${"─".repeat(40)}${ANSI.reset}`;
     }
@@ -93,14 +92,26 @@ function applyInlineStyles(text: string): string {
   result = result.replace(/__([^_]+)__/g, `${ANSI.bold}$1${ANSI.reset}`);
 
   // Italic: *text* or _text_ (but not inside words)
-  result = result.replace(/(?<![*\w])\*([^*]+)\*(?![*\w])/g, `${ANSI.italic}$1${ANSI.reset}`);
-  result = result.replace(/(?<![_\w])_([^_]+)_(?![_\w])/g, `${ANSI.italic}$1${ANSI.reset}`);
+  result = result.replace(
+    /(?<![*\w])\*([^*]+)\*(?![*\w])/g,
+    `${ANSI.italic}$1${ANSI.reset}`,
+  );
+  result = result.replace(
+    /(?<![_\w])_([^_]+)_(?![_\w])/g,
+    `${ANSI.italic}$1${ANSI.reset}`,
+  );
 
   // Inline code: `code`
-  result = result.replace(/`([^`]+)`/g, `${ANSI.bgCyan}${ANSI.bold} $1 ${ANSI.reset}`);
+  result = result.replace(
+    /`([^`]+)`/g,
+    `${ANSI.bgCyan}${ANSI.bold} $1 ${ANSI.reset}`,
+  );
 
   // Links: [text](url) - show text underlined
-  result = result.replace(/\[([^\]]+)\]\([^)]+\)/g, `${ANSI.underline}${ANSI.blue}$1${ANSI.reset}`);
+  result = result.replace(
+    /\[([^\]]+)\]\([^)]+\)/g,
+    `${ANSI.underline}${ANSI.blue}$1${ANSI.reset}`,
+  );
 
   // Strikethrough: ~~text~~
   result = result.replace(/~~([^~]+)~~/g, `${ANSI.dim}$1${ANSI.reset}`);
@@ -131,7 +142,8 @@ export function renderTable(headers: string[], rows: string[][]): string {
 
   // Rows
   for (const row of rows) {
-    const rowLine = row.map((cell, i) => (cell || "").padEnd(colWidths[i])).join(" │ ");
+    const rowLine = row.map((cell, i) => (cell || "").padEnd(colWidths[i]))
+      .join(" │ ");
     lines.push(`│ ${rowLine} │`);
   }
 

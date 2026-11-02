@@ -4,7 +4,8 @@
  */
 
 // At-Risk Students Report prompt
-export const AT_RISK_REPORT_PROMPT = `You are an Academic Risk Analyst generating a comprehensive At-Risk Students Report for university administration.
+export const AT_RISK_REPORT_PROMPT =
+  `You are an Academic Risk Analyst generating a comprehensive At-Risk Students Report for university administration.
 
 ## Your Task
 Analyze the provided student data and generate a detailed markdown report identifying students at academic risk.
@@ -47,7 +48,8 @@ Analyze the provided student data and generate a detailed markdown report identi
 Generate the complete report in markdown format. Start with a title and generation timestamp.`;
 
 // Department Performance Report prompt
-export const DEPARTMENT_REPORT_PROMPT = `You are an Academic Performance Analyst generating a Department Performance Report for university leadership.
+export const DEPARTMENT_REPORT_PROMPT =
+  `You are an Academic Performance Analyst generating a Department Performance Report for university leadership.
 
 ## Your Task
 Analyze department statistics and generate a comparative performance report.
@@ -98,7 +100,8 @@ Analyze department statistics and generate a comparative performance report.
 Generate the complete report in markdown format with professional formatting.`;
 
 // Intervention Action Plan prompt
-export const INTERVENTION_REPORT_PROMPT = `You are an Academic Intervention Specialist generating an Intervention Action Plan for immediate administrative action.
+export const INTERVENTION_REPORT_PROMPT =
+  `You are an Academic Intervention Specialist generating an Intervention Action Plan for immediate administrative action.
 
 ## Your Task
 Analyze at-risk data and problem areas to create a prioritized action plan with specific interventions.
@@ -170,7 +173,7 @@ Generate the complete action plan in markdown format. Use checkboxes, tables, an
  * Get the appropriate prompt for a report type
  */
 export function getReportPrompt(
-  reportType: "at-risk" | "department" | "intervention"
+  reportType: "at-risk" | "department" | "intervention",
 ): string {
   switch (reportType) {
     case "at-risk":

@@ -1,11 +1,12 @@
+import { ChatAnthropic } from "@langchain/anthropic";
 import { ChatOpenAI } from "@langchain/openai";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
-import { HumanMessage, AIMessage } from "@langchain/core/messages";
+import { AIMessage, HumanMessage } from "@langchain/core/messages";
 import type { StructuredToolInterface } from "@langchain/core/tools";
 import type { BaseChatModel } from "@langchain/core/language_models/chat_models";
 
-// Type for supported LLM providers (extensible for future)
-export type LLMProvider = "openai";
+// Type for supported LLM providers
+export type LLMProvider = "openai" | "anthropic";
 
 // Configuration for agent creation
 export interface AgentConfig {
@@ -15,26 +16,70 @@ export interface AgentConfig {
   maxTokens?: number;
 }
 
-// Default configuration
-const DEFAULT_CONFIG: Required<AgentConfig> = {
-  provider: "openai",
-  model: "gpt-4o",
-  temperature: 0.1,
-  maxTokens: 4096,
+// Per-provider defaults. Claude's thinking counts toward maxTokens, so it gets more room.
+const PROVIDER_DEFAULTS: Record<
+  LLMProvider,
+  { model: string; maxTokens: number; apiKeyEnvVar: string }
+> = {
+  openai: { model: "gpt-4o", maxTokens: 4096, apiKeyEnvVar: "OPENAI_API_KEY" },
+  anthropic: {
+    model: "claude-opus-5-5",
+    maxTokens: 16000,
+    apiKeyEnvVar: "ANTHROPIC_API_KEY",
+  },
 };
+
+const DEFAULT_TEMPERATURE = 0.1;
+
+/**
+ * Resolve the provider and model from config, then LLM_PROVIDER and LLM_MODEL
+ * Blank environment values count as unset, since .env files often leave them empty
+ */
+export function getLLMSelection(config: AgentConfig = {}) {
+  const provider = config.provider ??
+    (Deno.env.get("LLM_PROVIDER") || "openai");
+  if (!Object.hasOwn(PROVIDER_DEFAULTS, provider)) {
+    throw new Error(
+      `Unknown LLM_PROVIDER "${provider}": use "openai" or "anthropic"`,
+    );
+  }
+
+  const defaults = PROVIDER_DEFAULTS[provider as LLMProvider];
+  return {
+    provider: provider as LLMProvider,
+    model: config.model ?? (Deno.env.get("LLM_MODEL") || defaults.model),
+    maxTokens: config.maxTokens ?? defaults.maxTokens,
+    apiKeyEnvVar: defaults.apiKeyEnvVar,
+  };
+}
 
 /**
  * Create an LLM instance based on provider configuration
+ * This is the only place a chat provider is chosen
  */
-export function createLLM(config: AgentConfig = {}) {
-  const mergedConfig = { ...DEFAULT_CONFIG, ...config };
+export function createLLM(config: AgentConfig = {}): BaseChatModel {
+  const { provider, model, maxTokens, apiKeyEnvVar } = getLLMSelection(config);
+  const apiKey = Deno.env.get(apiKeyEnvVar);
 
-  // Currently supporting OpenAI (extensible)
+  if (provider === "anthropic") {
+    return new ChatAnthropic({
+      model,
+      maxTokens,
+      apiKey,
+      // @langchain/anthropic 0.3 always sends these, and current Claude models reject them
+      invocationKwargs: {
+        temperature: undefined,
+        top_p: undefined,
+        top_k: undefined,
+      },
+    });
+  }
+
   return new ChatOpenAI({
-    model: mergedConfig.model,
-    temperature: mergedConfig.temperature,
-    maxTokens: mergedConfig.maxTokens,
-    apiKey: Deno.env.get("OPENAI_API_KEY"),
+    model,
+    temperature: config.temperature ?? DEFAULT_TEMPERATURE,
+    maxTokens,
+    apiKey,
   });
 }
 
@@ -45,7 +90,7 @@ export function createLLM(config: AgentConfig = {}) {
 export function createAgent(
   tools: StructuredToolInterface[],
   systemPrompt: string,
-  config: AgentConfig = {}
+  config: AgentConfig = {},
 ) {
   const llm = createLLM(config);
 
@@ -68,7 +113,7 @@ export function createAgent(
 export async function executeQuery(
   // deno-lint-ignore no-explicit-any
   agent: any,
-  query: string
+  query: string,
 ): Promise<string> {
   try {
     const response = await agent.invoke({
@@ -79,14 +124,8 @@ export async function executeQuery(
     const messages = response.messages;
     const lastMessage = messages[messages.length - 1];
 
-    // Handle different message types
-    if (lastMessage instanceof AIMessage) {
-      return typeof lastMessage.content === "string"
-        ? lastMessage.content
-        : JSON.stringify(lastMessage.content);
-    }
-
-    return String(lastMessage.content);
+    // .text covers OpenAI's plain strings and Claude's content blocks
+    return lastMessage.text;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Agent execution failed: ${error.message}`);
@@ -102,7 +141,7 @@ export async function executeQueryWithHistory(
   // deno-lint-ignore no-explicit-any
   agent: any,
   query: string,
-  history: { role: "user" | "assistant"; content: string }[]
+  history: { role: "user" | "assistant"; content: string }[],
 ): Promise<string> {
   // Convert history to LangChain message format
   const messages = history.map((msg) =>
@@ -120,13 +159,7 @@ export async function executeQueryWithHistory(
     const responseMessages = response.messages;
     const lastMessage = responseMessages[responseMessages.length - 1];
 
-    if (lastMessage instanceof AIMessage) {
-      return typeof lastMessage.content === "string"
-        ? lastMessage.content
-        : JSON.stringify(lastMessage.content);
-    }
-
-    return String(lastMessage.content);
+    return lastMessage.text;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Agent execution failed: ${error.message}`);
@@ -141,7 +174,7 @@ export async function executeQueryWithHistory(
 export async function* streamQuery(
   // deno-lint-ignore no-explicit-any
   agent: any,
-  query: string
+  query: string,
 ): AsyncGenerator<string, void, unknown> {
   const stream = await agent.stream({
     messages: [new HumanMessage(query)],
@@ -151,8 +184,8 @@ export async function* streamQuery(
     // Yield intermediate results
     if (chunk.agent?.messages) {
       for (const msg of chunk.agent.messages) {
-        if (msg instanceof AIMessage && typeof msg.content === "string") {
-          yield msg.content;
+        if (msg instanceof AIMessage) {
+          yield msg.text;
         }
       }
     }

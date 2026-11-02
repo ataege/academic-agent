@@ -1,11 +1,19 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import type { AcademicData } from "../types/academic.ts";
-import { findStudent, findCourse, getCurrentEnrollments } from "../data/loader.ts";
+import {
+  findCourse,
+  findStudent,
+  getCurrentEnrollments,
+} from "../data/loader.ts";
 import { assessStudentRisk } from "../analysis/risk-assessment.ts";
-import { calculateGraduationProgress, getRecommendedNextCourses, getGraduationTimeline } from "../analysis/graduation.ts";
+import {
+  calculateGraduationProgress,
+  getGraduationTimeline,
+  getRecommendedNextCourses,
+} from "../analysis/graduation.ts";
 import { predictFinalGrade } from "../analysis/gpa-calculator.ts";
-import { searchCourses, getPersonalizedRecommendations } from "../rag/course-retriever.ts";
+import { getPersonalizedRecommendations } from "../rag/course-retriever.ts";
 
 /**
  * Create student-specific tools bound to a specific student
@@ -19,10 +27,10 @@ export function createStudentTools(data: AcademicData, studentId: string) {
 
   // Tool 1: Get student profile and academic standing
   const getStudentProfile = tool(
-    async () => {
+    () => {
       const riskAssessment = assessStudentRisk(student, data);
       const department = data.departments.find(
-        (d) => d.id === student.department_id
+        (d) => d.id === student.department_id,
       );
 
       return JSON.stringify({
@@ -44,12 +52,12 @@ export function createStudentTools(data: AcademicData, studentId: string) {
       name: "get_student_profile",
       description:
         "Get the student's academic profile including GPA, credits, status, and risk assessment. Use this to understand the student's current academic standing.",
-    }
+    },
   );
 
   // Tool 2: Get current semester courses and grades
   const getCurrentCourses = tool(
-    async () => {
+    () => {
       const currentEnrollments = getCurrentEnrollments(student);
 
       const coursesWithDetails = currentEnrollments.map((enrollment) => {
@@ -75,12 +83,12 @@ export function createStudentTools(data: AcademicData, studentId: string) {
       name: "get_current_courses",
       description:
         "Get all courses the student is currently enrolled in with their midterm scores, homework averages, and attendance. Use this to see current semester performance.",
-    }
+    },
   );
 
   // Tool 3: Identify at-risk courses
   const getAtRiskCourses = tool(
-    async () => {
+    () => {
       const currentEnrollments = getCurrentEnrollments(student);
 
       const atRiskCourses = currentEnrollments
@@ -93,7 +101,7 @@ export function createStudentTools(data: AcademicData, studentId: string) {
             enrollment.midterm_score!,
             "CC",
             data.grade_weights,
-            data.grading_scale
+            data.grading_scale,
           );
 
           return {
@@ -111,22 +119,21 @@ export function createStudentTools(data: AcademicData, studentId: string) {
       return JSON.stringify({
         atRiskCount: atRiskCourses.length,
         courses: atRiskCourses,
-        summary:
-          atRiskCourses.length === 0
-            ? "No courses currently at risk of failing"
-            : `${atRiskCourses.length} course(s) need immediate attention`,
+        summary: atRiskCourses.length === 0
+          ? "No courses currently at risk of failing"
+          : `${atRiskCourses.length} course(s) need immediate attention`,
       });
     },
     {
       name: "get_at_risk_courses",
       description:
         "Identify courses where the student is at risk of failing based on midterm scores. Shows required final exam score to pass and whether passing is achievable.",
-    }
+    },
   );
 
   // Tool 4: Get graduation progress
   const getGraduationProgress = tool(
-    async () => {
+    () => {
       const progress = calculateGraduationProgress(student, data);
       const timeline = getGraduationTimeline(student, data);
 
@@ -154,21 +161,32 @@ export function createStudentTools(data: AcademicData, studentId: string) {
       name: "get_graduation_progress",
       description:
         "Get detailed graduation progress including remaining requirements, credits needed, estimated graduation date, and whether the student is on track.",
-    }
+    },
   );
 
   // Tool 5: Get course history
   const getCourseHistory = tool(
-    async () => {
+    () => {
       const completedEnrollments = student.enrollments.filter(
-        (e) => e.status !== "in_progress"
+        (e) => e.status !== "in_progress",
       );
 
       // Group by semester
-      const bySemester: Record<string, any[]> = {};
+      const bySemester: Record<
+        string,
+        {
+          courseCode: string;
+          courseName: string;
+          grade: string | null;
+          score: number | null;
+          status: string;
+          credits: number;
+        }[]
+      > = {};
       for (const enrollment of completedEnrollments) {
-        const semesterName =
-          data.semesters.find((s) => s.id === enrollment.semester_id)?.name ??
+        const semesterName = data.semesters.find((s) =>
+          s.id === enrollment.semester_id
+        )?.name ??
           enrollment.semester_id;
         const course = findCourse(data, enrollment.course_id);
 
@@ -198,12 +216,12 @@ export function createStudentTools(data: AcademicData, studentId: string) {
       name: "get_course_history",
       description:
         "Get complete course history organized by semester, showing grades, scores, and pass/fail status for all completed courses.",
-    }
+    },
   );
 
   // Tool 6: Get personalized recommendations
   const getRecommendations = tool(
-    async () => {
+    () => {
       const riskAssessment = assessStudentRisk(student, data);
       const graduationProgress = calculateGraduationProgress(student, data);
       const nextCourses = getRecommendedNextCourses(student, data, 4);
@@ -214,7 +232,7 @@ export function createStudentTools(data: AcademicData, studentId: string) {
       // GPA-based recommendations
       if (student.gpa < 2.0) {
         immediateActions.push(
-          "Priority: Raise GPA above 2.0 to meet graduation requirements"
+          "Priority: Raise GPA above 2.0 to meet graduation requirements",
         );
         immediateActions.push("Consider reduced course load next semester");
       } else if (student.gpa < 2.5) {
@@ -222,9 +240,11 @@ export function createStudentTools(data: AcademicData, studentId: string) {
         immediateActions.push("Utilize tutoring and study groups");
       } else if (student.gpa >= 3.5) {
         immediateActions.push(
-          "Consider graduate school preparation or research opportunities"
+          "Consider graduate school preparation or research opportunities",
         );
-        immediateActions.push("Explore challenging electives to broaden skills");
+        immediateActions.push(
+          "Explore challenging electives to broaden skills",
+        );
       }
 
       // Course recommendations
@@ -251,7 +271,7 @@ export function createStudentTools(data: AcademicData, studentId: string) {
       name: "get_recommendations",
       description:
         "Get personalized recommendations including immediate actions, next semester course suggestions, and graduation priorities based on current academic standing.",
-    }
+    },
   );
 
   // Tool 7: Search courses by topic (RAG)
@@ -259,9 +279,9 @@ export function createStudentTools(data: AcademicData, studentId: string) {
     async ({ query }) => {
       const results = await getPersonalizedRecommendations(
         query,
-        studentId,
+        student.id,
         data,
-        3
+        3,
       );
 
       return JSON.stringify({
@@ -284,10 +304,10 @@ export function createStudentTools(data: AcademicData, studentId: string) {
         query: z
           .string()
           .describe(
-            "The topic, skill, or interest to search for (e.g., 'machine learning', 'web development')"
+            "The topic, skill, or interest to search for (e.g., 'machine learning', 'web development')",
           ),
       }),
-    }
+    },
   );
 
   return [

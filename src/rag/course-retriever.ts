@@ -1,6 +1,7 @@
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { Document } from "@langchain/core/documents";
+import type { EmbeddingsInterface } from "@langchain/core/embeddings";
 import type { AcademicData, Course } from "../types/academic.ts";
 
 // Singleton vector store instance
@@ -12,7 +13,8 @@ let isInitialized = false;
  * Creates semantic search capability over course descriptions
  */
 export async function initializeCourseVectorStore(
-  data: AcademicData
+  data: AcademicData,
+  embeddings?: EmbeddingsInterface,
 ): Promise<MemoryVectorStore> {
   if (vectorStore && isInitialized) {
     return vectorStore;
@@ -40,13 +42,14 @@ export async function initializeCourseVectorStore(
     });
   });
 
-  // Create embeddings instance
-  const embeddings = new OpenAIEmbeddings({
-    model: "text-embedding-3-small", // Cost-effective embedding model
-  });
-
-  // Build vector store
-  vectorStore = await MemoryVectorStore.fromDocuments(documents, embeddings);
+  // Build vector store, using OpenAI embeddings unless the caller supplies its own
+  vectorStore = await MemoryVectorStore.fromDocuments(
+    documents,
+    embeddings ??
+      new OpenAIEmbeddings({
+        model: "text-embedding-3-small", // Cost-effective embedding model
+      }),
+  );
   isInitialized = true;
 
   console.log(`Vector store initialized with ${documents.length} courses`);
@@ -66,7 +69,7 @@ function buildCourseDocument(course: Course, data: AcademicData): string {
     .join(", ");
 
   const department = data.departments.find(
-    (d) => d.id === course.department_id
+    (d) => d.id === course.department_id,
   );
 
   return `
@@ -86,7 +89,7 @@ Description: ${course.description}
 export async function searchCourses(
   query: string,
   data: AcademicData,
-  topK: number = 3
+  topK: number = 3,
 ): Promise<{
   courses: {
     courseId: string;
@@ -111,7 +114,7 @@ export async function searchCourses(
       courseName: doc.metadata.courseName as string,
       credits: doc.metadata.credits as number,
       type: doc.metadata.type as string,
-      relevanceScore: 1 - score, // Convert distance to similarity (higher = better)
+      relevanceScore: score, // MemoryVectorStore returns cosine similarity (higher = better)
       description: doc.pageContent,
     })),
   };
@@ -127,7 +130,7 @@ export async function findCoursesByTopic(
     maxResults?: number;
     courseType?: "required" | "elective" | "all";
     departmentId?: string;
-  } = {}
+  } = {},
 ): Promise<Course[]> {
   const { maxResults = 5, courseType = "all", departmentId } = options;
 
@@ -157,7 +160,7 @@ export async function getPersonalizedRecommendations(
   query: string,
   studentId: string,
   data: AcademicData,
-  maxResults: number = 3
+  maxResults: number = 3,
 ): Promise<{
   recommended: Course[];
   reasoning: string[];
@@ -171,13 +174,13 @@ export async function getPersonalizedRecommendations(
   const passedCourseIds = new Set(
     student.enrollments
       .filter((e) => e.status === "passed")
-      .map((e) => e.course_id)
+      .map((e) => e.course_id),
   );
 
   const currentlyEnrolledIds = new Set(
     student.enrollments
       .filter((e) => e.status === "in_progress")
-      .map((e) => e.course_id)
+      .map((e) => e.course_id),
   );
 
   // Search for relevant courses
@@ -205,17 +208,17 @@ export async function getPersonalizedRecommendations(
 
     if (!prereqsMet) {
       const missingPrereqs = course.prerequisites.filter(
-        (p) => !passedCourseIds.has(p)
+        (p) => !passedCourseIds.has(p),
       );
       reasoning.push(
-        `${course.code} requires: ${missingPrereqs.join(", ")}`
+        `${course.code} requires: ${missingPrereqs.join(", ")}`,
       );
       continue;
     }
 
     recommended.push(course);
     reasoning.push(
-      `${course.code} matches your interest and you have completed prerequisites`
+      `${course.code} matches your interest and you have completed prerequisites`,
     );
 
     if (recommended.length >= maxResults) break;

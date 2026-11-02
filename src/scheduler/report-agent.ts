@@ -1,24 +1,19 @@
-import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage } from "@langchain/core/messages";
+import { createLLM, getLLMSelection } from "../agents/base-agent.ts";
 import type { AcademicData } from "../types/academic.ts";
-import { getAtRiskStudents, summarizeRiskStatus } from "../analysis/risk-assessment.ts";
-import { getDepartmentStatistics, getInstitutionOverview, getProblemCourses } from "../analysis/department-stats.ts";
+import {
+  getAtRiskStudents,
+  summarizeRiskStatus,
+} from "../analysis/risk-assessment.ts";
+import {
+  getDepartmentStatistics,
+  getInstitutionOverview,
+  getProblemCourses,
+} from "../analysis/department-stats.ts";
 import { getReportPrompt } from "./report-prompts.ts";
 
 // Report types supported
 export type ReportType = "at-risk" | "department" | "intervention";
-
-/**
- * Create LLM instance configured for report generation
- */
-function createReportLLM() {
-  return new ChatOpenAI({
-    model: "gpt-4o",
-    temperature: 0.3, // Slightly creative for natural prose
-    maxTokens: 4096,  // Enough for detailed reports
-    apiKey: Deno.env.get("OPENAI_API_KEY"),
-  });
-}
 
 /**
  * Prepare data context for at-risk students report
@@ -79,7 +74,8 @@ function prepareAtRiskData(data: AcademicData) {
       criticalCount: summary.critical,
       warningCount: summary.warning,
       normalCount: summary.normal,
-      atRiskPercentage: ((summary.critical + summary.warning) / summary.total * 100).toFixed(1),
+      atRiskPercentage:
+        ((summary.critical + summary.warning) / summary.total * 100).toFixed(1),
     },
     students: enrichedStudents,
   };
@@ -110,7 +106,9 @@ function prepareDepartmentData(data: AcademicData) {
       totalStudents: dept.totalStudents,
       averageGPA: dept.averageGPA.toFixed(2),
       atRiskCount: dept.atRiskCount,
-      atRiskPercentage: ((dept.atRiskCount / dept.totalStudents) * 100).toFixed(1),
+      atRiskPercentage: ((dept.atRiskCount / dept.totalStudents) * 100).toFixed(
+        1,
+      ),
       probationCount: dept.probationCount,
       courses: dept.courseStats.map((cs) => ({
         id: cs.courseId,
@@ -129,8 +127,12 @@ function prepareDepartmentData(data: AcademicData) {
  */
 function prepareInterventionData(data: AcademicData) {
   const atRiskStudents = getAtRiskStudents(data);
-  const criticalStudents = atRiskStudents.filter((s) => s.riskLevel === "critical");
-  const warningStudents = atRiskStudents.filter((s) => s.riskLevel === "warning");
+  const criticalStudents = atRiskStudents.filter((s) =>
+    s.riskLevel === "critical"
+  );
+  const warningStudents = atRiskStudents.filter((s) =>
+    s.riskLevel === "warning"
+  );
   const problemCourses = getProblemCourses(data, 15);
   const summary = summarizeRiskStatus(data);
 
@@ -196,9 +198,9 @@ function prepareDataContext(reportType: ReportType, data: AcademicData) {
  */
 export async function generateAIReport(
   reportType: ReportType,
-  data: AcademicData
+  data: AcademicData,
 ): Promise<string> {
-  const llm = createReportLLM();
+  const llm = createLLM({ temperature: 0.3 }); // Slightly creative for natural prose
 
   // Get the appropriate prompt for this report type
   const systemPrompt = getReportPrompt(reportType);
@@ -224,18 +226,8 @@ Now generate the complete report based on the above data:`;
   // Call the LLM
   const response = await llm.invoke([new HumanMessage(fullPrompt)]);
 
-  // Extract content from response
-  const content = response.content;
-  if (typeof content === "string") {
-    return content;
-  }
-
-  // Handle array content (shouldn't happen but be safe)
-  if (Array.isArray(content)) {
-    return content.map((c) => (typeof c === "string" ? c : JSON.stringify(c))).join("\n");
-  }
-
-  return String(content);
+  // .text covers OpenAI's plain strings and Claude's content blocks
+  return response.text;
 }
 
 /**
@@ -249,7 +241,7 @@ export function generateReportHeader(title: string): string {
   return `# ${title}
 
 > **Generated:** ${dateStr} at ${timeStr}
-> **System:** AI-Generated Report (GPT-4o)
+> **System:** AI-Generated Report (${getLLMSelection().model})
 > **University:** Tech University | Academic Year: 2024-2025
 
 ---

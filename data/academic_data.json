@@ -5,15 +5,15 @@
     "academic_year": "2024-2025"
   },
   "grading_scale": {
-    "AA": {"min": 90, "max": 100, "gpa": 4.0},
-    "BA": {"min": 85, "max": 89, "gpa": 3.5},
-    "BB": {"min": 80, "max": 84, "gpa": 3.0},
-    "CB": {"min": 75, "max": 79, "gpa": 2.5},
-    "CC": {"min": 70, "max": 74, "gpa": 2.0},
-    "DC": {"min": 65, "max": 69, "gpa": 1.5},
-    "DD": {"min": 60, "max": 64, "gpa": 1.0},
-    "FD": {"min": 50, "max": 59, "gpa": 0.5},
-    "FF": {"min": 0, "max": 49, "gpa": 0.0}
+    "AA": { "min": 90, "max": 100, "gpa": 4.0 },
+    "BA": { "min": 85, "max": 89, "gpa": 3.5 },
+    "BB": { "min": 80, "max": 84, "gpa": 3.0 },
+    "CB": { "min": 75, "max": 79, "gpa": 2.5 },
+    "CC": { "min": 70, "max": 74, "gpa": 2.0 },
+    "DC": { "min": 65, "max": 69, "gpa": 1.5 },
+    "DD": { "min": 60, "max": 64, "gpa": 1.0 },
+    "FD": { "min": 50, "max": 59, "gpa": 0.5 },
+    "FF": { "min": 0, "max": 49, "gpa": 0.0 }
   },
   "grade_weights": {
     "midterm": 0.4,
@@ -65,9 +65,17 @@
         "min_credits": 140,
         "min_gpa": 2.0,
         "required_courses": [
-          "CENG101", "CENG102", "CENG201", "CENG202",
-          "CENG301", "CENG302", "CENG401", "CENG402",
-          "MATH101", "MATH102", "MATH201"
+          "CENG101",
+          "CENG102",
+          "CENG201",
+          "CENG202",
+          "CENG301",
+          "CENG302",
+          "CENG401",
+          "CENG402",
+          "MATH101",
+          "MATH102",
+          "MATH201"
         ],
         "min_elective_credits": 18
       }
@@ -80,9 +88,17 @@
         "min_credits": 140,
         "min_gpa": 2.0,
         "required_courses": [
-          "SENG101", "SENG102", "SENG201", "SENG202",
-          "SENG301", "SENG302", "SENG401", "SENG402",
-          "MATH101", "MATH102", "MATH201"
+          "SENG101",
+          "SENG102",
+          "SENG201",
+          "SENG202",
+          "SENG301",
+          "SENG302",
+          "SENG401",
+          "SENG402",
+          "MATH101",
+          "MATH102",
+          "MATH201"
         ],
         "min_elective_credits": 18
       }

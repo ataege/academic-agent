@@ -1,8 +1,11 @@
-import { load } from "jsr:@std/dotenv";
+import { load } from "@std/dotenv";
 import { loadAcademicData } from "./src/data/loader.ts";
-import { createStudentAgent, getStudentInfo } from "./src/agents/student-agent.ts";
+import {
+  createStudentAgent,
+  getStudentInfo,
+} from "./src/agents/student-agent.ts";
 import { createDeanAgent } from "./src/agents/dean-agent.ts";
-import { executeQuery } from "./src/agents/base-agent.ts";
+import { executeQuery, getLLMSelection } from "./src/agents/base-agent.ts";
 import { generateDailyReports } from "./src/scheduler/report-generator.ts";
 import { initializeCourseVectorStore } from "./src/rag/course-retriever.ts";
 import { renderMarkdown } from "./src/utils/terminal-markdown.ts";
@@ -65,14 +68,15 @@ function parseArgs(): CLIArgs {
 /**
  * Display the welcome banner
  */
-function showBanner(): void {
+function showBanner(model: string): void {
+  const poweredBy = `Powered by LangChain + ${model}`.padEnd(59);
   console.log(`${colors.cyan}
 ╔════════════════════════════════════════════════════════════════╗
 ║                                                                ║
 ║     ${colors.bright}Academic Advisor AI Agent${colors.reset}${colors.cyan}                             ║
 ║     ${colors.dim}Tech University - 2024-2025${colors.reset}${colors.cyan}                            ║
 ║                                                                ║
-║     ${colors.yellow}Powered by LangChain + OpenAI GPT-4o${colors.reset}${colors.cyan}                    ║
+║     ${colors.yellow}${poweredBy}${colors.reset}${colors.cyan}║
 ║                                                                ║
 ╚════════════════════════════════════════════════════════════════╝
 ${colors.reset}`);
@@ -83,9 +87,16 @@ ${colors.reset}`);
  */
 async function prompt(message: string): Promise<string> {
   const buf = new Uint8Array(1024);
-  await Deno.stdout.write(new TextEncoder().encode(`${colors.green}${message}${colors.reset}`));
+  await Deno.stdout.write(
+    new TextEncoder().encode(`${colors.green}${message}${colors.reset}`),
+  );
   const n = await Deno.stdin.read(buf);
-  return new TextDecoder().decode(buf.subarray(0, n ?? 0)).trim();
+  // Closed input (Ctrl-D or the end of a pipe) would otherwise loop on empty answers forever
+  if (n === null) {
+    console.log();
+    Deno.exit(0);
+  }
+  return new TextDecoder().decode(buf.subarray(0, n)).trim();
 }
 
 /**
@@ -93,9 +104,15 @@ async function prompt(message: string): Promise<string> {
  */
 async function showMainMenu(): Promise<string> {
   console.log(`\n${colors.bright}Select Mode:${colors.reset}`);
-  console.log(`  ${colors.cyan}1.${colors.reset} Student Mode ${colors.dim}(personalized academic advice)${colors.reset}`);
-  console.log(`  ${colors.cyan}2.${colors.reset} Dean Mode ${colors.dim}(institutional analysis)${colors.reset}`);
-  console.log(`  ${colors.cyan}3.${colors.reset} Generate Reports ${colors.dim}(daily analysis reports)${colors.reset}`);
+  console.log(
+    `  ${colors.cyan}1.${colors.reset} Student Mode ${colors.dim}(personalized academic advice)${colors.reset}`,
+  );
+  console.log(
+    `  ${colors.cyan}2.${colors.reset} Dean Mode ${colors.dim}(institutional analysis)${colors.reset}`,
+  );
+  console.log(
+    `  ${colors.cyan}3.${colors.reset} Generate Reports ${colors.dim}(daily analysis reports)${colors.reset}`,
+  );
   console.log(`  ${colors.cyan}4.${colors.reset} Exit`);
 
   return await prompt("\nEnter choice (1-4): ");
@@ -108,18 +125,23 @@ async function selectStudent(data: AcademicData): Promise<string | null> {
   console.log(`\n${colors.bright}Available Students:${colors.reset}`);
 
   data.students.forEach((student, index) => {
-    const statusColor =
-      student.status === "active"
-        ? colors.green
-        : student.status === "warning"
-        ? colors.yellow
-        : colors.red;
-    const gpaColor = student.gpa >= 3.0 ? colors.green : student.gpa >= 2.0 ? colors.yellow : colors.red;
+    const statusColor = student.status === "active"
+      ? colors.green
+      : student.status === "warning"
+      ? colors.yellow
+      : colors.red;
+    const gpaColor = student.gpa >= 3.0
+      ? colors.green
+      : student.gpa >= 2.0
+      ? colors.yellow
+      : colors.red;
 
     console.log(
-      `  ${colors.cyan}${index + 1}.${colors.reset} ${student.name} (${student.id}) ` +
+      `  ${colors.cyan}${
+        index + 1
+      }.${colors.reset} ${student.name} (${student.id}) ` +
         `- ${statusColor}${student.status}${colors.reset} ` +
-        `- GPA: ${gpaColor}${student.gpa.toFixed(2)}${colors.reset}`
+        `- GPA: ${gpaColor}${student.gpa.toFixed(2)}${colors.reset}`,
     );
   });
 
@@ -141,15 +163,25 @@ async function chatLoop(
   // deno-lint-ignore no-explicit-any
   agent: any,
   mode: string,
-  studentInfo?: { name: string; gpa: number } | null
+  studentInfo?: { name: string; gpa: number } | null,
 ): Promise<void> {
-  console.log(`\n${colors.cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
+  console.log(
+    `\n${colors.cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`,
+  );
   console.log(`${colors.bright}${mode} Mode Active${colors.reset}`);
   if (studentInfo) {
-    console.log(`${colors.dim}Student: ${studentInfo.name} | GPA: ${studentInfo.gpa.toFixed(2)}${colors.reset}`);
+    console.log(
+      `${colors.dim}Student: ${studentInfo.name} | GPA: ${
+        studentInfo.gpa.toFixed(2)
+      }${colors.reset}`,
+    );
   }
-  console.log(`${colors.dim}Type 'exit' to return to menu, 'help' for example queries${colors.reset}`);
-  console.log(`${colors.cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}\n`);
+  console.log(
+    `${colors.dim}Type 'exit' to return to menu, 'help' for example queries${colors.reset}`,
+  );
+  console.log(
+    `${colors.cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}\n`,
+  );
 
   // Show example queries
   showExampleQueries(mode);
@@ -176,12 +208,16 @@ async function chatLoop(
     try {
       const response = await executeQuery(agent, query);
       const styledResponse = renderMarkdown(response);
-      console.log(`\n${colors.bright}🤖 Advisor:${colors.reset}\n${styledResponse}`);
+      console.log(
+        `\n${colors.bright}🤖 Advisor:${colors.reset}\n${styledResponse}`,
+      );
     } catch (error) {
       if (error instanceof Error) {
         console.log(`${colors.red}❌ Error: ${error.message}${colors.reset}`);
         if (error.message.includes("API key")) {
-          console.log(`${colors.yellow}💡 Tip: Make sure OPENAI_API_KEY is set in your .env file${colors.reset}`);
+          console.log(
+            `${colors.yellow}💡 Tip: Make sure ${getLLMSelection().apiKeyEnvVar} is set in your .env file${colors.reset}`,
+          );
         }
       }
     }
@@ -195,17 +231,35 @@ function showExampleQueries(mode: string): void {
   console.log(`${colors.dim}Example queries:${colors.reset}`);
 
   if (mode === "Student") {
-    console.log(`  ${colors.dim}• "What is my current academic standing?"${colors.reset}`);
-    console.log(`  ${colors.dim}• "Which courses am I at risk of failing?"${colors.reset}`);
-    console.log(`  ${colors.dim}• "What are my graduation requirements?"${colors.reset}`);
-    console.log(`  ${colors.dim}• "What courses should I take next semester?"${colors.reset}`);
-    console.log(`  ${colors.dim}• "I'm interested in AI - what courses are available?"${colors.reset}`);
+    console.log(
+      `  ${colors.dim}• "What is my current academic standing?"${colors.reset}`,
+    );
+    console.log(
+      `  ${colors.dim}• "Which courses am I at risk of failing?"${colors.reset}`,
+    );
+    console.log(
+      `  ${colors.dim}• "What are my graduation requirements?"${colors.reset}`,
+    );
+    console.log(
+      `  ${colors.dim}• "What courses should I take next semester?"${colors.reset}`,
+    );
+    console.log(
+      `  ${colors.dim}• "I'm interested in AI - what courses are available?"${colors.reset}`,
+    );
   } else {
     console.log(`  ${colors.dim}• "Show all at-risk students"${colors.reset}`);
-    console.log(`  ${colors.dim}• "What is the performance of CENG department?"${colors.reset}`);
-    console.log(`  ${colors.dim}• "Which courses have the highest failure rates?"${colors.reset}`);
-    console.log(`  ${colors.dim}• "What interventions do you recommend?"${colors.reset}`);
-    console.log(`  ${colors.dim}• "Give me an overview of the institution"${colors.reset}`);
+    console.log(
+      `  ${colors.dim}• "What is the performance of CENG department?"${colors.reset}`,
+    );
+    console.log(
+      `  ${colors.dim}• "Which courses have the highest failure rates?"${colors.reset}`,
+    );
+    console.log(
+      `  ${colors.dim}• "What interventions do you recommend?"${colors.reset}`,
+    );
+    console.log(
+      `  ${colors.dim}• "Give me an overview of the institution"${colors.reset}`,
+    );
   }
 }
 
@@ -213,21 +267,31 @@ function showExampleQueries(mode: string): void {
  * Run report generation mode
  */
 async function runReportMode(): Promise<void> {
-  console.log(`\n${colors.cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
+  console.log(
+    `\n${colors.cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`,
+  );
   console.log(`${colors.bright}Report Generation Mode${colors.reset}`);
-  console.log(`${colors.cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}\n`);
+  console.log(
+    `${colors.cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}\n`,
+  );
 
   try {
     const { outputDir, reports } = await generateDailyReports();
 
-    console.log(`\n${colors.green}✅ Reports generated successfully!${colors.reset}`);
-    console.log(`\n${colors.bright}Reports available at:${colors.reset} ${outputDir}`);
+    console.log(
+      `\n${colors.green}✅ Reports generated successfully!${colors.reset}`,
+    );
+    console.log(
+      `\n${colors.bright}Reports available at:${colors.reset} ${outputDir}`,
+    );
     for (const report of reports) {
       console.log(`  ${colors.cyan}•${colors.reset} ${report}`);
     }
   } catch (error) {
     if (error instanceof Error) {
-      console.log(`${colors.red}❌ Report generation failed: ${error.message}${colors.reset}`);
+      console.log(
+        `${colors.red}❌ Report generation failed: ${error.message}${colors.reset}`,
+      );
     }
   }
 }
@@ -236,13 +300,17 @@ async function runReportMode(): Promise<void> {
  * Main application entry point
  */
 async function main(): Promise<void> {
-  showBanner();
+  const { model, apiKeyEnvVar } = getLLMSelection();
+  showBanner(model);
 
-  // Check for API key
-  const apiKey = Deno.env.get("OPENAI_API_KEY");
-  if (!apiKey) {
-    console.log(`${colors.yellow}⚠️  Warning: OPENAI_API_KEY not found in environment${colors.reset}`);
-    console.log(`${colors.dim}   Set it in .env file or export OPENAI_API_KEY=your_key${colors.reset}\n`);
+  // Check for the selected provider's API key
+  if (!Deno.env.get(apiKeyEnvVar)) {
+    console.log(
+      `${colors.yellow}⚠️  Warning: ${apiKeyEnvVar} not found in environment${colors.reset}`,
+    );
+    console.log(
+      `${colors.dim}   Set it in .env file or export ${apiKeyEnvVar}=your_key${colors.reset}\n`,
+    );
   }
 
   // Load academic data
@@ -251,11 +319,13 @@ async function main(): Promise<void> {
   try {
     data = await loadAcademicData();
     console.log(
-      `${colors.green}✓${colors.reset} Loaded ${data.students.length} students, ${data.courses.length} courses\n`
+      `${colors.green}✓${colors.reset} Loaded ${data.students.length} students, ${data.courses.length} courses\n`,
     );
   } catch (error) {
     if (error instanceof Error) {
-      console.log(`${colors.red}❌ Failed to load data: ${error.message}${colors.reset}`);
+      console.log(
+        `${colors.red}❌ Failed to load data: ${error.message}${colors.reset}`,
+      );
     }
     Deno.exit(1);
   }
@@ -265,8 +335,10 @@ async function main(): Promise<void> {
   try {
     await initializeCourseVectorStore(data);
     console.log(`${colors.green}✓${colors.reset} Course search ready\n`);
-  } catch (error) {
-    console.log(`${colors.yellow}⚠️  Course search initialization skipped (API key required)${colors.reset}\n`);
+  } catch {
+    console.log(
+      `${colors.yellow}⚠️  Course search initialization skipped (needs OPENAI_API_KEY for embeddings)${colors.reset}\n`,
+    );
   }
 
   // Parse CLI arguments
@@ -281,7 +353,9 @@ async function main(): Promise<void> {
   if (args.mode === "student" && args.studentId) {
     const studentInfo = getStudentInfo(data, args.studentId);
     if (!studentInfo) {
-      console.log(`${colors.red}Student not found: ${args.studentId}${colors.reset}`);
+      console.log(
+        `${colors.red}Student not found: ${args.studentId}${colors.reset}`,
+      );
       Deno.exit(1);
     }
     const agent = createStudentAgent(data, args.studentId);
@@ -305,7 +379,9 @@ async function main(): Promise<void> {
         const studentId = await selectStudent(data);
         if (studentId) {
           const studentInfo = getStudentInfo(data, studentId);
-          console.log(`\n${colors.dim}Creating student advisor agent...${colors.reset}`);
+          console.log(
+            `\n${colors.dim}Creating student advisor agent...${colors.reset}`,
+          );
           const agent = createStudentAgent(data, studentId);
           await chatLoop(agent, "Student", studentInfo);
         }
@@ -313,7 +389,9 @@ async function main(): Promise<void> {
       }
       case "2": {
         // Dean mode
-        console.log(`\n${colors.dim}Creating institutional analysis agent...${colors.reset}`);
+        console.log(
+          `\n${colors.dim}Creating institutional analysis agent...${colors.reset}`,
+        );
         const agent = createDeanAgent(data);
         await chatLoop(agent, "Dean");
         break;
@@ -325,10 +403,12 @@ async function main(): Promise<void> {
       }
       case "4": {
         console.log(`\n${colors.cyan}Goodbye! 👋${colors.reset}\n`);
-        Deno.exit(0);
+        return Deno.exit(0);
       }
       default:
-        console.log(`${colors.red}Invalid choice. Please enter 1-4.${colors.reset}`);
+        console.log(
+          `${colors.red}Invalid choice. Please enter 1-4.${colors.reset}`,
+        );
     }
   }
 }
