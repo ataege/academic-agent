@@ -18,5 +18,5 @@ jobs:
           deno-version: v2.9.7
       - run: deno fmt --check
       - run: deno lint
-      - run: deno check main.ts
+      - run: deno check main.ts src/mcp/main.ts
       - run: deno task test
