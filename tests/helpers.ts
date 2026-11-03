@@ -1,3 +1,4 @@
+import type { EmbeddingsInterface } from "@langchain/core/embeddings";
 import type {
   AcademicData,
   Enrollment,
@@ -72,3 +73,21 @@ export function failedCourse(courseId: string): Enrollment {
     status: "failed",
   });
 }
+
+// Word-count vectors stand in for OpenAI: similarity follows shared words, with no key or network
+function wordVector(text: string): number[] {
+  const vector = new Array(512).fill(0);
+  for (const word of text.toLowerCase().match(/[a-z]+/g) ?? []) {
+    let bucket = 0;
+    for (const letter of word) {
+      bucket = (bucket * 31 + letter.charCodeAt(0)) % vector.length;
+    }
+    vector[bucket] += 1;
+  }
+  return vector;
+}
+
+export const localEmbeddings: EmbeddingsInterface = {
+  embedQuery: (text) => Promise.resolve(wordVector(text)),
+  embedDocuments: (texts) => Promise.resolve(texts.map(wordVector)),
+};
