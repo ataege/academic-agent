@@ -9,19 +9,24 @@ dean's assistant with an institution-wide view. Between them they use 13 tools
 that do their calculations in ordinary, unit-tested TypeScript and return
 structured JSON, so the model explains results instead of computing them. A RAG
 tool adds semantic course search, a report mode writes three Markdown reports,
-and chat runs on OpenAI or Anthropic, chosen by an environment variable.
+and chat runs on OpenAI or Anthropic, chosen by an environment variable. An
+[MCP server](#mcp-server) exposes the same tools, plus resources and prompts, to
+any MCP client such as Claude Desktop or Claude Code.
 
 ## Architecture
 
 ```mermaid
 flowchart TD
     CLI["main.ts<br/>menu, student, dean, report"]
+    MCP["src/mcp<br/>MCP server, stdio or HTTP"]
     CLI --> StudentAgent["Student advisor<br/>ReAct agent"]
     CLI --> DeanAgent["Dean's assistant<br/>ReAct agent"]
     CLI --> Reports["Report generator<br/>src/scheduler"]
 
     StudentAgent --> StudentTools["7 student tools<br/>bound to one student"]
     DeanAgent --> DeanTools["6 dean tools<br/>institution-wide"]
+    MCP -->|student role| StudentTools
+    MCP -->|dean role| DeanTools
 
     StudentTools --> Analysis["src/analysis<br/>GPA, graduation, risk, department stats"]
     DeanTools --> Analysis
@@ -49,6 +54,7 @@ src/analysis/          GPA, graduation, risk and department calculations
 src/rag/               Course embeddings and semantic search
 src/scheduler/         Report prompts and generation
 src/data/loader.ts     Loading and lookups for the JSON data
+src/mcp/               MCP server: tools, resources, prompts and transports
 data/                  Synthetic data: 6 students, 23 courses, 2 departments
 tests/                 Unit tests, run without an API key or network access
 ```
@@ -160,6 +166,104 @@ intervention plan would answer the question below along these lines:
 > **Course-level:** Calculus II has the highest fail rate at 28.6%, followed by
 > Object-Oriented Programming at 20.0%.
 
+## MCP server
+
+The MCP server starts in one role and registers only that role's tools. In the
+student role it is pinned to one student ID at startup, and no student tool
+takes an ID, so a client can't reach another student's records. Every tool is
+read-only. It needs no API key, except `search_courses_by_topic`, which uses
+OpenAI embeddings.
+
+```sh
+deno task mcp --role=student --student=STU001
+deno task mcp --role=dean
+```
+
+### Connect a client
+
+Claude Code, from the repository directory:
+
+```sh
+claude mcp add academic -- deno task mcp --role=student --student=STU001
+```
+
+Claude Desktop, in `claude_desktop_config.json`, with the absolute path to your
+clone:
+
+```json
+{
+  "mcpServers": {
+    "academic-student": {
+      "command": "deno",
+      "args": [
+        "run",
+        "--allow-read",
+        "--allow-env",
+        "--allow-net",
+        "/absolute/path/to/academic-agent/src/mcp/main.ts",
+        "--role=student",
+        "--student=STU001"
+      ]
+    }
+  }
+}
+```
+
+The server finds its data and `.env` relative to its own file, so clients can
+launch it from any directory.
+
+To browse everything interactively, use the
+[MCP Inspector](https://github.com/modelcontextprotocol/inspector):
+
+```sh
+npx @modelcontextprotocol/inspector deno task mcp --role=dean
+```
+
+### What it exposes
+
+| Kind      | Student role                                                                  | Dean role                                       |
+| --------- | ----------------------------------------------------------------------------- | ----------------------------------------------- |
+| Tools     | The 7 student tools, bound to one student                                     | The 6 dean tools                                |
+| Resources | `academic://courses`, `academic://courses/{code}`, `academic://grading-scale` | The same, plus `academic://students/{id}`       |
+| Prompts   | `advising-session`                                                            | `at-risk-review`, with an optional `department` |
+
+Tools keep the names and descriptions the agents use. Each returns
+`structuredContent` matching a published `outputSchema`, plus the same JSON as
+text for clients that don't read structured output. A lookup miss, such as an
+unknown course code, comes back as a tool error the model can act on.
+
+### Remote mode
+
+Streamable HTTP is available for clients that connect by URL:
+
+```sh
+MCP_AUTH_TOKEN=$(openssl rand -hex 32) deno task mcp --role=dean --transport=http --port=3000
+```
+
+The endpoint is `http://127.0.0.1:3000/mcp`, and `/health` answers without a
+token. Requests need `Authorization: Bearer <token>`. The server binds to
+localhost unless `--hostname` says otherwise, rejects browser requests from
+other websites by their `Origin` header, and on localhost also checks the `Host`
+header against DNS rebinding. It is stateless, so each request gets a fresh
+server.
+
+### MCP design notes
+
+- **Role scoping:** a role decides which tools exist, rather than a check inside
+  each tool, so the model can't call what isn't registered.
+- **Thin layer:** `src/mcp` wraps the existing LangChain tools, so the agents
+  and MCP clients get the same results from the same code.
+- **Strict output schemas:** they list every field, and the tests parse every
+  tool's output against them, so a changed tool can't silently drift from its
+  schema.
+- **Data is data:** tool results go back to a model, and free text in the data,
+  such as advisor notes and course descriptions, could carry prompt-injection
+  text. Results are structured fields, the tools are read-only, and each role
+  sees only what it needs.
+- **stdio and HTTP:** stdio is the default for local clients, which launch the
+  server as a process. HTTP is for clients that need a URL, and uses a bearer
+  token instead of full OAuth.
+
 ## Design decisions
 
 ### Why ReAct agents
@@ -204,11 +308,14 @@ Tests cover the analysis modules and the data loader using the sample data,
 including no completed courses, failed and retaken courses, and missing
 prerequisites. Provider selection, the tool loop and report generation run
 against a fake Anthropic API inside the test process, and course search runs on
-local word-count embeddings. The test task doesn't grant network access, so a
-test that tries to use it fails.
+local word-count embeddings. The MCP tests connect a real MCP client to the
+server in memory, and to the HTTP handler without opening a port, and check role
+scoping, output schemas, resources, prompts, authentication and error handling.
+The test task doesn't grant network access, so a test that tries to use it
+fails.
 
-CI runs `deno fmt --check`, `deno lint`, `deno check main.ts` and
-`deno task test` with no secrets configured.
+CI runs `deno fmt --check`, `deno lint`, `deno check main.ts src/mcp/main.ts`
+and `deno task test` with no secrets configured.
 
 ## Limitations
 
@@ -240,6 +347,9 @@ CI runs `deno fmt --check`, `deno lint`, `deno check main.ts` and
   not the quality of model answers.
 - **No access control:** anyone running the CLI can open any student or the dean
   view.
+
+- **Static MCP token:** remote mode uses one shared bearer token, not the OAuth
+  flow the MCP spec describes for remote servers.
 
 ## Next steps
 
